@@ -1,12 +1,16 @@
 import { HttpClient, Methods } from './HttpClient'
 
-export abstract class BaseModel<Attributes extends Record<string, any>> {
+export interface Attributes extends Record<string, any> {
+  id?: string | number
+}
+
+export abstract class BaseModel<A extends Attributes> {
   id?: string | number
   [key: string]: any
 
   static resource: string
 
-  constructor(data?: Partial<Attributes>) {
+  constructor(data?: Partial<A>) {
     if (data) {
       Object.assign(this, data)
     }

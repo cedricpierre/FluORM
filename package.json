@@ -19,9 +19,6 @@
   },
   "homepage": "https://github.com/cedricpierre/ts-api-sdk#readme",
   "devDependencies": {
-    "@types/node": "^22.13.17",
-    "ts-node": "^10.9.2",
-    "ts-node-dev": "^2.0.0",
     "typescript": "^5.8.2"
   },
   "dependencies": {

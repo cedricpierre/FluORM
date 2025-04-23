@@ -1,6 +1,7 @@
 import { BaseModel } from "./BaseModel"
 import { HttpClient, Methods } from "./HttpClient"
-import { RelationQuery } from "./RelationQuery"
+import { URLQueryBuilder } from "./URLQueryBuilder"
+import { URLBuilder } from "./URLBuilder"
 
 export type Relation<T> = any
 export type RelationFor<T> = T extends Array<any> ? Relation<T> : Relation<T[]>
@@ -17,8 +18,8 @@ export type RelationType = keyof typeof Relations;
 
 export class Builder {
     static build<T>(
-        parent: BaseModel,
-        relatedModelFactory: () => new (...args: any[]) => BaseModel,
+        parent: BaseModel<any>,
+        relatedModelFactory: () => new (...args: any[]) => BaseModel<any>,
         relationType: RelationType,
         resourceOverride?: string
     ): Relation<T> {
@@ -31,7 +32,7 @@ export class Builder {
         if (!parent.id) throw new Error('Missing parent ID')
 
         const basePath = `${HttpClient.options.baseUrl}/${parent.id}/${resource}`
-        const query = new RelationQuery()
+        const query = new URLQueryBuilder()
 
         const builder: any = {
             where: (key: string, value: any) => { query.where(key, value); return builder },
@@ -52,8 +53,8 @@ export class Builder {
             }
         }
 
-        const buildUrl = (suffix = '') =>
-            new URLBuilder(basePath + suffix).query(query.toObject()).toString()
+        const buildUrl = (queryParams: Record<string, any> = {}) =>
+            new URLBuilder(basePath).query({ ...query.toObject(), ...queryParams }).toString()
 
         if (relationType === Relations.hasOne) {
             return {
@@ -74,8 +75,9 @@ export class Builder {
                     const existing = await HttpClient.call(buildUrl())
                     return await HttpClient.call(`${basePath}/${existing.id}`, { method: Methods.DELETE })
                 },
-                firstOrCreate: async (where: any, createData?: any) => {
-                    const found = await HttpClient.call(buildUrl() + '&' + new URLSearchParams(where).toString())
+                firstOrCreate: async (where: Record<string, any>, createData?: any) => {
+                    query.where(where)
+                    const found = await HttpClient.call(buildUrl())
                     if (found?.length) return new RelatedModel(found[0])
                     const created = await HttpClient.call(basePath, {
                         method: Methods.POST,
@@ -83,8 +85,9 @@ export class Builder {
                     })
                     return new RelatedModel(created)
                 },
-                updateOrCreate: async (where: any, updateData: any) => {
-                    const found = await HttpClient.call(buildUrl() + '&' + new URLSearchParams(where).toString())
+                updateOrCreate: async (where: Record<string, any>, updateData: any) => {
+                    query.where(where)
+                    const found = await HttpClient.call(buildUrl())
                     if (found?.length) {
                         return await HttpClient.call(`${basePath}/${found[0].id}`, {
                             method: Methods.PATCH,
@@ -132,11 +135,14 @@ export class Builder {
                 await HttpClient.call(`${basePath}/${id}`, { method: Methods.DELETE })
             },
             paginate: async (page = 1, perPage = 10) => {
-                const list = await HttpClient.call(buildUrl() + `&page=${page}&per_page=${perPage}`)
+                query.offset((page - 1) * perPage).limit(perPage)
+
+                const list = await HttpClient.call(buildUrl())
                 return list.map((i: any) => new RelatedModel(i))
             },
-            firstOrCreate: async (where: any, createData?: any) => {
-                const list = await HttpClient.call(buildUrl() + '&' + new URLSearchParams(where).toString())
+            firstOrCreate: async (where: Record<string, any>, createData?: any) => {
+                query.where(where)
+                const list = await HttpClient.call(buildUrl())
                 const existing = list[0]
                 if (existing) return new RelatedModel(existing)
                 const created = await HttpClient.call(basePath, {
@@ -145,8 +151,9 @@ export class Builder {
                 })
                 return new RelatedModel(created)
             },
-            updateOrCreate: async (where: any, updateData: any) => {
-                const list = await HttpClient.call(buildUrl() + '&' + new URLSearchParams(where).toString())
+            updateOrCreate: async (where: Record<string, any>, updateData: any) => {
+                query.where(where)
+                const list = await HttpClient.call(buildUrl())
                 const existing = list[0]
                 if (existing) {
                     const updated = await HttpClient.call(`${basePath}/${existing.id}`, {

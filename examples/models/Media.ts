@@ -3,11 +3,11 @@ import { User } from './User'
 import { BaseModel } from '../../src/BaseModel'
 import { Relation } from '../../src/Builder'
 
-export class Media extends BaseModel {
+export class Media extends BaseModel<any> {
     static resource = 'medias'
 
     @BelongsTo(() => User)
-    user!: () => Relation<User>
+    declare user: Relation<User>
 
     // Scopes dynamiques (optionnels)
     static scopes = {

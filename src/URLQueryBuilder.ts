@@ -1,12 +1,12 @@
-export class RelationQuery {
+export class URLQueryBuilder {
     private filters: Record<string, any> = {}
     private includes: string[] = []
     private sort: string[] = []
     private _limit?: number
     private _offset?: number
 
-    where(key: string, value: any): this {
-        this.filters[key] = value
+    where(obj: Record<string, any>): this {
+        this.filters = { ...this.filters, ...obj }
         return this
     }
 
