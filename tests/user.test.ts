@@ -3,15 +3,14 @@ import { User } from '../examples/models/User'
 import { HttpClient } from '../src/HttpClient'
 import { Media } from '../examples/models/Media'
 import { URLBuilder } from '../src/URLBuilder'
+import { Thumbnail } from '../examples/models/Thumbnail'
 
 let user: User
 let medias: Media[]
-let generatedUrl: any
 
 describe('User Model', () => {
   beforeEach(() => {
     vi.restoreAllMocks()
-    generatedUrl = vi.spyOn(URLBuilder.prototype, 'toString')
   })
 
   it('can create a user', async () => {
@@ -80,6 +79,8 @@ describe('User Model', () => {
       { id: '1', name: 'Photo', url: 'https://example.com/photo1.jpg' }
     ])
 
+    const generatedUrl = vi.spyOn(URLBuilder.prototype, 'toString')
+
     medias = await user.medias.where({ name: 'Photo' }).paginate(1, 1)
 
     expect(medias).toBeInstanceOf(Array)
@@ -107,6 +108,32 @@ describe('User Model', () => {
     expect(newUser).toBeInstanceOf(User)
     expect(newUser.id).toBe('123')
     expect(newUser.name).toBe('Cedric')
+
+    vi.spyOn(HttpClient, 'call').mockResolvedValue([
+      { id: '1', size: 'sm', url: 'https://example.com/photo1.jpg' }
+    ])
+
+    const thumbnail = await media.thumbnails.first()
+
+    expect(thumbnail).toBeInstanceOf(Thumbnail)
+    expect(thumbnail.id).toBe('1')
+    expect(thumbnail.size).toBe('sm')
+    expect(thumbnail.url).toBe('https://example.com/photo1.jpg')
+
+    vi.spyOn(HttpClient, 'call').mockResolvedValue([
+      { id: '1', size: 'sm', url: 'https://example.com/photo1.jpg' },
+      { id: '2', size: 'md', url: 'https://example.com/photo2.jpg' }
+    ])
+    
+    const generatedUrl = vi.spyOn(URLBuilder.prototype, 'toString')
+
+    const thumbnails = await media.thumbnails.all()
+
+    expect(thumbnails).toBeInstanceOf(Array)
+    expect(thumbnails).toHaveLength(2)
+    expect(thumbnails.every((thumbnail: Thumbnail) => thumbnail instanceof Thumbnail)).toBe(true)
+    expect(generatedUrl).toHaveBeenCalled()
+    
   })
 
   it('can find users where name is Cedric', async () => {
@@ -114,6 +141,7 @@ describe('User Model', () => {
       { id: '1', name: 'Cedric', email: 'cedric@example.com' }
     ])
 
+    const generatedUrl = vi.spyOn(URLBuilder.prototype, 'toString')
 
     const users = await User
       .where({ name: 'Cedric' })

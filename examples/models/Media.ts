@@ -1,7 +1,8 @@
-import { BelongsTo } from '../../src/decorators'
+import { BelongsTo, HasMany } from '../../src/decorators'
 import { User } from './User'
 import { BaseModel } from '../../src/BaseModel'
 import { Relation } from '../../src/Builder'
+import { Thumbnail } from './Thumbnail'
 
 export class Media extends BaseModel<any> {
     static resource = 'medias'
@@ -9,9 +10,6 @@ export class Media extends BaseModel<any> {
     @BelongsTo(() => User as any)
     declare user: Relation<User>
 
-    // Scopes dynamiques (optionnels)
-    static scopes = {
-        active: () => ({ active: true }),
-        latest: () => ({ sort: '-created_at' }),
-    }
+    @HasMany(() => Thumbnail as any)
+    declare thumbnails: Relation<Thumbnail[]>
 }
