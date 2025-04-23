@@ -1,14 +1,9 @@
 import { Builder, Relations, RelationType } from './Builder'
 import type { BaseModel } from './BaseModel'
 
-interface RelationConfig {
-    type: RelationType
-    resource?: string
-}
-
 export const makeRelation = (
-    relatedModelFactory: () => new (...args: any[]) => BaseModel<any>,
-    config: RelationConfig
+    modelFactory: () => new (...args: any[]) => BaseModel<any>,
+    type: RelationType
 ) => {
     // Create a WeakMap to store instance-specific data
     const store = new WeakMap<any, any>();
@@ -21,10 +16,10 @@ export const makeRelation = (
                 if (!store.has(this)) {
                     // Create and store the builder for this instance
                     const builder = Builder.build<any>(
+                        modelFactory,
                         this,
-                        relatedModelFactory,
-                        config.type,
-                        config.resource
+                        key,
+                        type,
                     );
                     store.set(this, builder);
                 }
@@ -42,12 +37,12 @@ export const makeRelation = (
 }
 
 // Aliases
-export const HasOne = (model: () => BaseModel<any>, resource?: string) => {
-    return makeRelation(model as any, { type: Relations.hasOne, resource })
+export const HasOne = (model: () => BaseModel<any>) => {
+    return makeRelation(model as any, Relations.hasOne)
 }
 
-export const HasMany = (model: () => BaseModel<any>, resource?: string) => {
-    return makeRelation(model as any, { type: Relations.hasMany, resource })
+export const HasMany = (model: () => BaseModel<any>) => {
+    return makeRelation(model as any, Relations.hasMany)
 }
 
 export const BelongsTo = HasOne

@@ -18,20 +18,24 @@ export type RelationType = keyof typeof Relations;
 
 export class Builder {
     static build<T>(
-        parent: BaseModel<any>,
-        relatedModelFactory: () => new (...args: any[]) => BaseModel<any>,
-        relationType: RelationType,
-        resourceOverride?: string
+        modelFactory: () => new (...args: any[]) => BaseModel<any>,
+        parent?: BaseModel<any>,
+        key?: string | symbol,
+        relationType?: RelationType,
     ): Relation<T> {
-        const RelatedModel = relatedModelFactory()
-        const resource =
-            resourceOverride ??
-            (RelatedModel as any).resource ??
-            RelatedModel.name.toLowerCase() + (relationType  === Relations.hasMany ? 's' : '')
 
-        if (!parent.id) throw new Error('Missing parent ID')
+        const RelatedModel = modelFactory()
 
-        const basePath = `${HttpClient.options.baseUrl}/${parent.id}/${resource}`
+        let basePath = `${HttpClient.options.baseUrl}/${(RelatedModel as any).resource}`
+        
+        if(parent) {
+            basePath += `/${(parent.constructor as any).resource}/${parent.id}`
+        }
+
+        if(key) {
+            basePath += `/${String(key)}`
+        }
+
         const query = new URLQueryBuilder()
 
         const builder: any = {

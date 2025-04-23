@@ -64,7 +64,7 @@ describe('User Model', () => {
     ])
 
     medias = await user.medias.all()
-
+    
     expect(medias).toBeInstanceOf(Array)
     expect(medias).toHaveLength(2)
     expect(medias.every((media: Media) => media instanceof Media)).toBe(true)

@@ -1,3 +1,4 @@
+import { Builder } from './Builder'
 import { HttpClient, Methods } from './HttpClient'
 
 export interface Attributes extends Record<string, any> {
@@ -10,48 +11,38 @@ export abstract class BaseModel<A extends Attributes> {
 
   static resource: string
 
+
   constructor(data?: Partial<A>) {
     if (data) {
       Object.assign(this, data)
     }
+
     return this
   }
 
   static async all<T extends BaseModel<any>>(this: new (...args: any[]) => T): Promise<T[]> {
-    const resource = (this as any).resource
-    const list = await HttpClient.call(`${resource}`)
-    return list.map((item: any) => new this(item))
+    const builder = Builder.build(() => this)
+    return builder.all()
   }
 
   static async find<T extends BaseModel<any>>(this: new (...args: any[]) => T, id: string | number): Promise<T> {
-    const resource = (this as any).resource
-    const data = await HttpClient.call(`${resource}/${id}`)
-    return new this(data)
+    const builder = Builder.build(() => this)
+    return builder.find(id)
   }
 
   static async create<T extends BaseModel<any>>(this: new (...args: any[]) => T, data: Partial<T>): Promise<T> {
-    const resource = (this as any).resource
-    const created = await HttpClient.call(`${resource}`, {
-      method: Methods.POST,
-      body: data
-    })
-    return new this(created)
+    const builder = Builder.build(() => this)
+    return builder.create(data)
   }
 
   static async update<T extends BaseModel<any>>(this: new (...args: any[]) => T, id: string | number, data: Partial<T>): Promise<T> {
-    const resource = (this as any).resource
-    const updated = await HttpClient.call(`${resource}/${id}`, {
-      method: Methods.PATCH,
-      body: data
-    })
-    return new this(updated)
+    const builder = Builder.build(() => this)
+    return builder.update(id, data)
   }
 
   static async delete(this: any, id: string | number): Promise<void> {
-    const resource = this.resource
-    await HttpClient.call(`${resource}/${id}`, {
-      method: Methods.DELETE
-    })
+    const builder = Builder.build(() => this)
+    return builder.delete(id)
   }
 
   static async firstOrCreate<T extends BaseModel<any>>(
@@ -59,15 +50,8 @@ export abstract class BaseModel<A extends Attributes> {
     where: Partial<T>,
     createData?: Partial<T>
   ): Promise<T> {
-    const resource = (this as any).resource
-    const query = new URLSearchParams(where as Record<string, string>).toString()
-    const list = await HttpClient.call(`${resource}?${query}`)
-    if (list.length) return new this(list[0])
-    const created = await HttpClient.call(`${resource}`, {
-      method: Methods.POST,
-      body: createData ?? where
-    })
-    return new this(created)
+    const builder = Builder.build(() => this)
+    return builder.firstOrCreate(where, createData)
   }
 
   static async updateOrCreate<T extends BaseModel<any>>(
@@ -75,21 +59,8 @@ export abstract class BaseModel<A extends Attributes> {
     where: Partial<T>,
     updateData: Partial<T>
   ): Promise<T> {
-    const resource = (this as any).resource
-    const query = new URLSearchParams(where as Record<string, string>).toString()
-    const list = await HttpClient.call(`${resource}?${query}`)
-    if (list.length) {
-      const updated = await HttpClient.call(`${resource}/${list[0].id}`, {
-        method: Methods.PATCH,
-        body: updateData
-      })
-      return new this(updated)
-    }
-    const created = await HttpClient.call(`${resource}`, {
-      method: Methods.POST,
-      body: { ...where, ...updateData }
-    })
-    return new this(created)
+    const builder = Builder.build(() => this)
+    return builder.updateOrCreate(where, updateData)
   }
 
   async save(): Promise<this> {
