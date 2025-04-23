@@ -89,6 +89,7 @@ describe('User Model', () => {
     expect(generatedUrl.mock.results[0].value).toContain('name=Photo')
     expect(generatedUrl.mock.results[0].value).toContain('page=1')
     expect(generatedUrl.mock.results[0].value).toContain('per_page=1')
+    expect(generatedUrl.mock.results[0].value).toContain('offset=0')
 
   })
 
