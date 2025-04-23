@@ -17,9 +17,7 @@ export class User extends BaseModel<UserAttributes> {
     @HasMany(() => Media as any)
     declare medias: Relation<Media[]>;
 
-    // Exemple de méthode statique pour un scope
     static scopes = {
         active: () => ({ status: 'active' }),
-        createdAfter: (date: string) => ({ created_at: { $gte: date } })
     }
 }

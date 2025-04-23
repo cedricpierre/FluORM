@@ -119,6 +119,7 @@ describe('User Model', () => {
       .where({ name: 'Cedric' })
       .filter({ email: 'cedric@example.com' })
       .include('medias')
+      .active()
       .all()
 
     expect(users).toHaveLength(1)
@@ -128,5 +129,6 @@ describe('User Model', () => {
     expect(generatedUrl.mock.results[0].value).toContain('name=Cedric')
     expect(generatedUrl.mock.results[0].value).toContain('email=cedric@example.com')
     expect(generatedUrl.mock.results[0].value).toContain('include=medias')
+    expect(generatedUrl.mock.results[0].value).toContain('status=active')
   })
 })
