@@ -15,32 +15,15 @@ export const Relations = {
 
 export type RelationType = keyof typeof Relations;
 
-export interface IBuilder<T extends BaseModel<any>> {
-    where(where: Record<string, any>): IBuilder<T>;
-    filter(filters: Record<string, any>): IBuilder<T>;
-    include(relations: string | string[]): IBuilder<T>;
-    orderBy(field: string, dir?: string): IBuilder<T>;
-    limit(n: number): IBuilder<T>;
-    offset(n: number): IBuilder<T>;
-    all(): Promise<T[]>;
-    first(): Promise<T | undefined>;
-    find(id: string | number): Promise<T>;
-    create(payload: any): Promise<T>;
-    update(id: string | number, payload: any): Promise<T>;
-    delete(id: string | number): Promise<void>;
-    paginate(page?: number, perPage?: number): Promise<T[]>;
-    firstOrCreate(where: Record<string, any>, createData?: any): Promise<T>;
-    updateOrCreate(where: Record<string, any>, updateData: any): Promise<T>;
-}
-
 export class Builder {
     static build<T extends BaseModel<any>>(
         modelFactory: () => new (...args: any[]) => T,
         parent?: BaseModel<any>,
         key?: string | symbol,
         relationType?: RelationType,
-    ): IBuilder<T> {
-
+        urlQueryBuilder?: URLQueryBuilder
+    ) {
+        const query = urlQueryBuilder ?? new URLQueryBuilder()
         const RelatedModel = modelFactory()
 
         let basePath = `${HttpClient.options.baseUrl}/${(RelatedModel as any).resource}`
@@ -53,15 +36,13 @@ export class Builder {
             basePath += `/${String(key)}`
         }
 
-        const query = new URLQueryBuilder()
-
         const queryBuilder: any = {
-            where: (where: Record<string, any>) => { query.where(where); return RelatedModel },
-            filter: (filters: Record<string, any>) => { query.filter(filters); return RelatedModel },
-            include: (relations: string | string[]) => { query.include(relations); return RelatedModel },
-            orderBy: (field: string, dir: string = 'asc') => { query.orderBy(field, dir); return RelatedModel },
-            limit: (n: number) => { query.limit(n); return RelatedModel },
-            offset: (n: number) => { query.offset(n); return RelatedModel },
+            where: (where: Record<string, any>) => { query.where(where); return this.build(modelFactory, parent, key, relationType, query) },
+            filter: (filters: Record<string, any>) => { query.filter(filters); return this.build(modelFactory, parent, key, relationType, query) },
+            include: (relations: string | string[]) => { query.include(relations); return this.build(modelFactory, parent, key, relationType, query) },
+            orderBy: (field: string, dir: string = 'asc') => { query.orderBy(field, dir); return this.build(modelFactory, parent, key, relationType, query) },
+            limit: (n: number) => { query.limit(n); return this.build(modelFactory, parent, key, relationType, query) },
+            offset: (n: number) => { query.offset(n); return this.build(modelFactory, parent, key, relationType, query) },
         }
 
         // 💡 Injection des scopes dynamiques
@@ -69,7 +50,7 @@ export class Builder {
             if (typeof fn === 'function') {
                 queryBuilder[name] = (...args: any[]) => {
                     query.filter(fn(...args))
-                    return this
+                    return this.build(modelFactory, parent, key, relationType, query)
                 }
             }
         }
@@ -122,7 +103,7 @@ export class Builder {
                     })
                     return new RelatedModel(created)
                 }
-            } as IBuilder<T>
+            } as Relation<T>
         }
 
         return {
@@ -191,6 +172,6 @@ export class Builder {
                 })
                 return new RelatedModel(created)
             }
-        } as IBuilder<T>
+        } as Relation<T>
     }
 }

@@ -1,4 +1,4 @@
-import { Builder, IBuilder } from './Builder'
+import { Builder, Relation } from './Builder'
 import { HttpClient, Methods } from './HttpClient'
 
 export interface Attributes extends Record<string, any> {
@@ -20,15 +20,15 @@ export abstract class BaseModel<A extends Attributes> {
     return this
   }
 
-  static where<T extends BaseModel<any>>(this: new (...args: any[]) => T, where: Partial<T>): IBuilder<T> {
+  static where<T extends BaseModel<any>>(this: new (...args: any[]) => T, where: Partial<T>): Relation<T> {
     return Builder.build(() => this).where(where)
   }
 
-  static filter<T extends BaseModel<any>>(this: new (...args: any[]) => T, filters: Record<string, any>): IBuilder<T> {
+  static filter<T extends BaseModel<any>>(this: new (...args: any[]) => T, filters: Record<string, any>): Relation<T> {
     return Builder.build(() => this).filter(filters)
   }
 
-  static include<T extends BaseModel<any>>(this: new (...args: any[]) => T, relations: string | string[]): IBuilder<T> {
+  static include<T extends BaseModel<any>>(this: new (...args: any[]) => T, relations: string | string[]): Relation<T> {
     return Builder.build(() => this).include(relations)
   }
 
