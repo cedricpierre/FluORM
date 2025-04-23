@@ -77,7 +77,7 @@ describe('User Model', () => {
       { id: '1', name: 'Photo 1', url: 'https://example.com/photo1.jpg' }
     ])
 
-    medias = await user.medias.paginate(1, 1)
+    medias = await user.medias.where({ name: 'Photo 1' }).paginate(1, 1)
 
     expect(medias).toBeInstanceOf(Array)
     expect(medias).toHaveLength(1)
@@ -106,7 +106,11 @@ describe('User Model', () => {
       { id: '1', name: 'Cedric', email: 'cedric@example.com' }
     ])
 
-    const users = await User.where({ name: 'Cedric' }).all()
+    const users = await User
+      .where({ name: 'Cedric' })
+      .filter({ email: 'cedric@example.com' })
+      .include('medias')
+      .all()
 
     expect(users).toHaveLength(1)
     expect(users[0]).toBeInstanceOf(User)
