@@ -91,4 +91,37 @@ export abstract class BaseModel<A extends Attributes> {
     })
     return new this(created)
   }
+
+  async save(): Promise<this> {
+    if (this.id) {
+      return this.update()
+    }
+    const resource = (this.constructor as any).resource
+    const data = await HttpClient.call(resource, {
+      method: Methods.POST,
+      body: { ...this }
+    })
+    Object.assign(this, data)
+    return this
+  }
+
+  async update(data?: Partial<this>): Promise<this> {
+    if (!this.id) throw new Error('Cannot update a model without an ID')
+    const resource = (this.constructor as any).resource
+    if (data) Object.assign(this.attributes, data)
+    const updated = await HttpClient.call(`${resource}/${this.id}`, {
+      method: Methods.PATCH,
+      body: { ...this }
+    })
+    Object.assign(this, updated)
+    return this
+  }
+
+  async delete(): Promise<void> {
+    if (!this.id) throw new Error('Cannot delete a model without an ID')
+    const resource = (this.constructor as any).resource
+    await HttpClient.call(`${resource}/${this.id}`, {
+      method: Methods.DELETE
+    })
+  }
 }

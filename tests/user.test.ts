@@ -13,6 +13,17 @@ describe('User Model', () => {
 
   it('can create a user', async () => {
     user = new User({ id: '123', name: 'Cedric', email: 'cedric@example.com' })
+    
+    expect(user).toBeInstanceOf(User)
+    expect(user.id).toBe('123')
+    expect(user.name).toBe('Cedric')
+  
+  })
+
+  it('can save a user', async () => {
+    vi.spyOn(HttpClient, 'call').mockResolvedValue(1)
+
+    await user.save()
 
     expect(user).toBeInstanceOf(User)
     expect(user.id).toBe('123')

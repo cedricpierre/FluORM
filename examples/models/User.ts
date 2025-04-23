@@ -14,7 +14,7 @@ interface UserAttributes extends Attributes {
 export class User extends BaseModel<UserAttributes> {
     static resource = 'users'
 
-    @HasMany(() => Media)
+    @HasMany(() => Media as any)
     declare medias: Relation<Media[]>;
 
     // Exemple de méthode statique pour un scope

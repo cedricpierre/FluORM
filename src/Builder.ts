@@ -35,7 +35,7 @@ export class Builder {
         const query = new URLQueryBuilder()
 
         const builder: any = {
-            where: (key: string, value: any) => { query.where(key, value); return builder },
+            where: (where: Record<string, any>) => { query.where(where); return builder },
             filter: (filters: Record<string, any>) => { query.filter(filters); return builder },
             include: (relations: string | string[]) => { query.include(relations); return builder },
             orderBy: (field: string, dir: 'asc' | 'desc' = 'asc') => { query.orderBy(field, dir); return builder },
@@ -110,11 +110,12 @@ export class Builder {
                 return list.map((i: any) => new RelatedModel(i))
             },
             first: async () => {
-                const list = await HttpClient.call(buildUrl('?limit=1'))
+                query.limit(1)
+                const list = await HttpClient.call(buildUrl())
                 return list[0] ? new RelatedModel(list[0]) : undefined
             },
             find: async (id: string) => {
-                const item = await HttpClient.call(buildUrl('/' + id))
+                const item = await HttpClient.call(`${basePath}/${id}`)
                 return new RelatedModel(item)
             },
             create: async (payload: any) => {

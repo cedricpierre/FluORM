@@ -6,7 +6,7 @@ import { Relation } from '../../src/Builder'
 export class Media extends BaseModel<any> {
     static resource = 'medias'
 
-    @BelongsTo(() => User)
+    @BelongsTo(() => User as any)
     declare user: Relation<User>
 
     // Scopes dynamiques (optionnels)
