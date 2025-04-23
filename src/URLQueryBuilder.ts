@@ -20,7 +20,7 @@ export class URLQueryBuilder {
         return this
     }
 
-    orderBy(field: string, direction: 'asc' | 'desc' = 'asc'): this {
+    orderBy(field: string, direction: string = 'asc'): this {
         this.sort.push(`${direction === 'desc' ? '-' : ''}${field}`)
         return this
     }

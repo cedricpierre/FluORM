@@ -64,7 +64,7 @@ describe('User Model', () => {
     ])
 
     medias = await user.medias.all()
-    
+
     expect(medias).toBeInstanceOf(Array)
     expect(medias).toHaveLength(2)
     expect(medias.every((media: Media) => media instanceof Media)).toBe(true)
@@ -99,5 +99,17 @@ describe('User Model', () => {
     expect(newUser).toBeInstanceOf(User)
     expect(newUser.id).toBe('123')
     expect(newUser.name).toBe('Cedric')
+  })
+
+  it('can find users where name is Cedric', async () => {
+    vi.spyOn(HttpClient, 'call').mockResolvedValue([
+      { id: '1', name: 'Cedric', email: 'cedric@example.com' }
+    ])
+
+    const users = await User.where({ name: 'Cedric' }).all()
+
+    expect(users).toHaveLength(1)
+    expect(users[0]).toBeInstanceOf(User)
+    expect(users[0].name).toBe('Cedric')
   })
 })

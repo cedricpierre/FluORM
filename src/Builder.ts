@@ -15,21 +15,38 @@ export const Relations = {
 
 export type RelationType = keyof typeof Relations;
 
+export interface IBuilder<T extends BaseModel<any>> {
+    where(where: Record<string, any>): IBuilder<T>;
+    filter(filters: Record<string, any>): IBuilder<T>;
+    include(relations: string | string[]): IBuilder<T>;
+    orderBy(field: string, dir?: string): IBuilder<T>;
+    limit(n: number): IBuilder<T>;
+    offset(n: number): IBuilder<T>;
+    all(): Promise<T[]>;
+    first(): Promise<T | undefined>;
+    find(id: string | number): Promise<T>;
+    create(payload: any): Promise<T>;
+    update(id: string | number, payload: any): Promise<T>;
+    delete(id: string | number): Promise<void>;
+    paginate(page?: number, perPage?: number): Promise<T[]>;
+    firstOrCreate(where: Record<string, any>, createData?: any): Promise<T>;
+    updateOrCreate(where: Record<string, any>, updateData: any): Promise<T>;
+}
 
 export class Builder {
-    static build<T>(
-        modelFactory: () => new (...args: any[]) => BaseModel<any>,
+    static build<T extends BaseModel<any>>(
+        modelFactory: () => new (...args: any[]) => T,
         parent?: BaseModel<any>,
         key?: string | symbol,
         relationType?: RelationType,
-    ): Relation<T> {
+    ): IBuilder<T> {
 
         const RelatedModel = modelFactory()
 
         let basePath = `${HttpClient.options.baseUrl}/${(RelatedModel as any).resource}`
         
-        if(parent) {
-            basePath += `/${(parent.constructor as any).resource}/${parent.id}`
+        if(parent?.id) {
+            basePath += `/${parent.id}`
         }
 
         if(key) {
@@ -38,31 +55,32 @@ export class Builder {
 
         const query = new URLQueryBuilder()
 
-        const builder: any = {
-            where: (where: Record<string, any>) => { query.where(where); return builder },
-            filter: (filters: Record<string, any>) => { query.filter(filters); return builder },
-            include: (relations: string | string[]) => { query.include(relations); return builder },
-            orderBy: (field: string, dir: 'asc' | 'desc' = 'asc') => { query.orderBy(field, dir); return builder },
-            limit: (n: number) => { query.limit(n); return builder },
-            offset: (n: number) => { query.offset(n); return builder },
+        const queryBuilder: any = {
+            where: (where: Record<string, any>) => { query.where(where); return RelatedModel },
+            filter: (filters: Record<string, any>) => { query.filter(filters); return RelatedModel },
+            include: (relations: string | string[]) => { query.include(relations); return RelatedModel },
+            orderBy: (field: string, dir: string = 'asc') => { query.orderBy(field, dir); return RelatedModel },
+            limit: (n: number) => { query.limit(n); return RelatedModel },
+            offset: (n: number) => { query.offset(n); return RelatedModel },
         }
 
         // 💡 Injection des scopes dynamiques
         for (const [name, fn] of Object.entries((RelatedModel as any).scopes ?? {})) {
             if (typeof fn === 'function') {
-                builder[name] = (...args: any[]) => {
+                queryBuilder[name] = (...args: any[]) => {
                     query.filter(fn(...args))
-                    return builder
+                    return this
                 }
             }
         }
 
-        const buildUrl = (queryParams: Record<string, any> = {}) =>
-            new URLBuilder(basePath).query({ ...query.toObject(), ...queryParams }).toString()
+        const buildUrl = (queryParams: Record<string, any> = {}) => {
+            return new URLBuilder(basePath).query({ ...query.toObject(), ...queryParams }).toString()
+        }
 
         if (relationType === Relations.hasOne) {
             return {
-                ...builder,
+                ...queryBuilder,
                 first: async () => {
                     const data = await HttpClient.call(buildUrl())
                     return new RelatedModel(data)
@@ -104,11 +122,11 @@ export class Builder {
                     })
                     return new RelatedModel(created)
                 }
-            } as Relation<T>
+            } as IBuilder<T>
         }
 
         return {
-            ...builder,
+            ...queryBuilder,
             all: async () => {
                 const list = await HttpClient.call(buildUrl())
                 return list.map((i: any) => new RelatedModel(i))
@@ -173,6 +191,6 @@ export class Builder {
                 })
                 return new RelatedModel(created)
             }
-        } as Relation<T>
+        } as IBuilder<T>
     }
 }

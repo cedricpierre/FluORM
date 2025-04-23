@@ -1,4 +1,4 @@
-import { Builder } from './Builder'
+import { Builder, IBuilder } from './Builder'
 import { HttpClient, Methods } from './HttpClient'
 
 export interface Attributes extends Record<string, any> {
@@ -20,29 +20,36 @@ export abstract class BaseModel<A extends Attributes> {
     return this
   }
 
+  static where<T extends BaseModel<any>>(this: new (...args: any[]) => T, where: Partial<T>): IBuilder<T> {
+    return Builder.build(() => this).where(where)
+  }
+
+  static filter<T extends BaseModel<any>>(this: new (...args: any[]) => T, filters: Record<string, any>): IBuilder<T> {
+    return Builder.build(() => this).filter(filters)
+  }
+
+  static include<T extends BaseModel<any>>(this: new (...args: any[]) => T, relations: string | string[]): IBuilder<T> {
+    return Builder.build(() => this).include(relations)
+  }
+
   static async all<T extends BaseModel<any>>(this: new (...args: any[]) => T): Promise<T[]> {
-    const builder = Builder.build(() => this)
-    return builder.all()
+    return Builder.build(() => this).all()
   }
 
   static async find<T extends BaseModel<any>>(this: new (...args: any[]) => T, id: string | number): Promise<T> {
-    const builder = Builder.build(() => this)
-    return builder.find(id)
+    return Builder.build(() => this).find(id)
   }
 
   static async create<T extends BaseModel<any>>(this: new (...args: any[]) => T, data: Partial<T>): Promise<T> {
-    const builder = Builder.build(() => this)
-    return builder.create(data)
+    return Builder.build(() => this).create(data)
   }
 
   static async update<T extends BaseModel<any>>(this: new (...args: any[]) => T, id: string | number, data: Partial<T>): Promise<T> {
-    const builder = Builder.build(() => this)
-    return builder.update(id, data)
+    return Builder.build(() => this).update(id, data)
   }
 
   static async delete(this: any, id: string | number): Promise<void> {
-    const builder = Builder.build(() => this)
-    return builder.delete(id)
+    return Builder.build(() => this).delete(id)
   }
 
   static async firstOrCreate<T extends BaseModel<any>>(
@@ -50,8 +57,7 @@ export abstract class BaseModel<A extends Attributes> {
     where: Partial<T>,
     createData?: Partial<T>
   ): Promise<T> {
-    const builder = Builder.build(() => this)
-    return builder.firstOrCreate(where, createData)
+    return Builder.build(() => this).firstOrCreate(where, createData)
   }
 
   static async updateOrCreate<T extends BaseModel<any>>(
@@ -59,8 +65,7 @@ export abstract class BaseModel<A extends Attributes> {
     where: Partial<T>,
     updateData: Partial<T>
   ): Promise<T> {
-    const builder = Builder.build(() => this)
-    return builder.updateOrCreate(where, updateData)
+    return Builder.build(() => this).updateOrCreate(where, updateData)
   }
 
   async save(): Promise<this> {
