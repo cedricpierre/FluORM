@@ -139,7 +139,10 @@ export class Builder {
                 await HttpClient.call(`${basePath}/${id}`, { method: Methods.DELETE })
             },
             paginate: async (page = 1, perPage = 10) => {
-                query.offset((page - 1) * perPage).limit(perPage)
+                query.page(page)
+                    .perPage(perPage)
+                    .offset((page - 1) * perPage)
+                    .limit(perPage)
 
                 const list = await HttpClient.call(buildUrl())
                 return list.map((i: any) => new RelatedModel(i))

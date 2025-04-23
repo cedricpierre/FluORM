@@ -4,6 +4,8 @@ export class URLQueryBuilder {
     private sort: string[] = []
     private _limit?: number
     private _offset?: number
+    private _page?: number
+    private _perPage?: number
 
     where(obj: Record<string, any>): this {
         this.filters = { ...this.filters, ...obj }
@@ -35,12 +37,25 @@ export class URLQueryBuilder {
         return this
     }
 
+
+    page(n: number): this {
+        this._page = n
+        return this
+    }
+
+    perPage(n: number): this {
+        this._perPage = n
+        return this
+    }
+
     toObject(): Record<string, any> {
         const obj: Record<string, any> = { ...this.filters }
         if (this.includes.length) obj.include = this.includes.join(',')
         if (this.sort.length) obj.sort = this.sort.join(',')
         if (this._limit !== undefined) obj.limit = this._limit
         if (this._offset !== undefined) obj.offset = this._offset
+        if (this._page !== undefined) obj.page = this._page
+        if (this._perPage !== undefined) obj.per_page = this._perPage
         return obj
     }
 }

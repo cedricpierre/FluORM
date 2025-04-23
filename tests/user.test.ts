@@ -2,13 +2,16 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { User } from '../examples/models/User'
 import { HttpClient } from '../src/HttpClient'
 import { Media } from '../examples/models/Media'
+import { URLBuilder } from '../src/URLBuilder'
 
 let user: User
 let medias: Media[]
+let generatedUrl: any
 
 describe('User Model', () => {
   beforeEach(() => {
-   vi.restoreAllMocks()
+    vi.restoreAllMocks()
+    generatedUrl = vi.spyOn(URLBuilder.prototype, 'toString')
   })
 
   it('can create a user', async () => {
@@ -74,14 +77,18 @@ describe('User Model', () => {
 
   it('can fetch all medias from user with pagination', async () => {
     vi.spyOn(HttpClient, 'call').mockResolvedValue([
-      { id: '1', name: 'Photo 1', url: 'https://example.com/photo1.jpg' }
+      { id: '1', name: 'Photo', url: 'https://example.com/photo1.jpg' }
     ])
 
-    medias = await user.medias.where({ name: 'Photo 1' }).paginate(1, 1)
+    medias = await user.medias.where({ name: 'Photo' }).paginate(1, 1)
 
     expect(medias).toBeInstanceOf(Array)
     expect(medias).toHaveLength(1)
     expect(medias.every((media: Media) => media instanceof Media)).toBe(true)
+    expect(generatedUrl).toHaveBeenCalled()
+    expect(generatedUrl.mock.results[0].value).toContain('name=Photo')
+    expect(generatedUrl.mock.results[0].value).toContain('page=1')
+    expect(generatedUrl.mock.results[0].value).toContain('per_page=1')
 
   })
 
@@ -106,6 +113,7 @@ describe('User Model', () => {
       { id: '1', name: 'Cedric', email: 'cedric@example.com' }
     ])
 
+
     const users = await User
       .where({ name: 'Cedric' })
       .filter({ email: 'cedric@example.com' })
@@ -115,5 +123,9 @@ describe('User Model', () => {
     expect(users).toHaveLength(1)
     expect(users[0]).toBeInstanceOf(User)
     expect(users[0].name).toBe('Cedric')
+    expect(generatedUrl).toHaveBeenCalled()
+    expect(generatedUrl.mock.results[0].value).toContain('name=Cedric')
+    expect(generatedUrl.mock.results[0].value).toContain('email=cedric@example.com')
+    expect(generatedUrl.mock.results[0].value).toContain('include=medias')
   })
 })

@@ -14,7 +14,6 @@ export class URLBuilder {
     toString(): string {
         const query = new URLSearchParams(this.queryParams).toString()
         const url = query ? `${this.path}?${query}` : this.path
-        console.log(url, this.queryParams)
-        return url
+        return decodeURIComponent(url)
     }
 }
