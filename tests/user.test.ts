@@ -22,6 +22,17 @@ describe('User Model', () => {
   
   })
 
+  it('can create a user with a thumbnail', async () => {
+    user = new User({ id: '123', name: 'Cedric', email: 'cedric@example.com' })
+    user.thumbnail = new Thumbnail({ id: '1', size: 'sm', url: 'https://example.com/photo1.jpg' })
+
+    expect(user).toBeInstanceOf(User)
+    expect(user.id).toBe('123')
+    expect(user.name).toBe('Cedric')
+    expect(user.thumbnail).toBeInstanceOf(Thumbnail)
+  
+  })
+
   it('can save a user', async () => {
     vi.spyOn(HttpClient, 'call').mockResolvedValue(1)
 

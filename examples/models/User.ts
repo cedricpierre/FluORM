@@ -1,8 +1,9 @@
-import { HasMany } from './../../src/decorators'
+import { Cast, HasMany } from './../../src/decorators'
 import { Media } from './Media'
 import { BaseModel } from '../../src/BaseModel'
 import { Relation } from '../../src/Builder'
 import { type Attributes } from '../../src/BaseModel'
+import { Thumbnail } from './Thumbnail'
 
 interface IUser extends Attributes {
     name: string
@@ -16,6 +17,10 @@ export class User extends BaseModel<IUser> {
 
     @HasMany(() => Media as any)
     declare medias: Relation<Media[]>;
+
+    @Cast(() => Thumbnail)
+    thumbnail?: Thumbnail
+
 
     static scopes = {
         active: () => ({ status: 'active' }),
