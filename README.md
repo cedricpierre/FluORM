@@ -8,6 +8,12 @@ FluORM is a lightweight and flexible Object-Relational Mapping (ORM) library for
 npm install fluorm
 ```
 
+Run tests
+
+```bash
+npm test
+```
+
 ## Configuration
 
 Before using FluORM, you need to configure it with your API base URL and optional interceptors:
