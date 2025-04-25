@@ -4,18 +4,19 @@
   "description": "FluORM is a fluent, model-oriented, typed REST client for TypeScript.",
   "main": "dist/index.js",
   "type": "module",
+  "author": "Cedric Pierre",
+  "email": "jirotoh@gmail.com",
   "scripts": {
     "build": "tsc",
     "test": "vitest"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cedricpierre/ts-api-sdk.git"
+    "url": "git+https://github.com/cedricpierre/flurorm.git"
   },
-  "author": "Cedric Pierre",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
-    "url": "https://github.com/cedricpierre/ts-api-sdk/issues"
+    "url": "https://github.com/cedricpierre/flurorm/issues"
   },
   "homepage": "https://github.com/cedricpierre/ts-api-sdk#readme",
   "devDependencies": {
