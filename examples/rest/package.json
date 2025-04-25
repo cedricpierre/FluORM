@@ -10,6 +10,6 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "fluorm": "^0.0.4"
+    "fluorm": "^0.0.5"
   }
 }

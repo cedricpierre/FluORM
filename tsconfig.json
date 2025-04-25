@@ -12,6 +12,8 @@
     "declaration": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
+    "allowJs": true,
+    "resolveJsonModule": true
   },
   "include": ["./src/**/*.ts"],
   "exclude": ["node_modules", "dist"]
