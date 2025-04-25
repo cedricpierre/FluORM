@@ -1,90 +1,26 @@
-import ApiClient, { type QueryParams } from "./ApiClient";
-import type ApiClientResponse from "./ApiClientResponse";
-export interface ModelAttributes {
-    id?: number | string;
-    [key: string]: any;
+import { Relation } from './Relations';
+export interface Attributes extends Record<string, any> {
+    id?: string | number;
 }
-/**
- * Represents a generic model class with attributes, payloads for creation and updating, and methods for interacting with an API client.
- *
- * @template Attributes - The type of the model's attributes. Defaults to an object with an `id` property of type `BigInt` or `string`.
- * @template CreatePayload - The type of the payload used for creating a new model instance. Defaults to the `Attributes` type without the `id` property.
- * @template UpdatePayload - The type of the payload used for updating an existing model instance. Defaults to the `Attributes` type without the `id` property.
- */
-export default class Model<Attributes extends ModelAttributes = any, CreatePayload extends Partial<Omit<Attributes, "id">> = any, UpdatePayload extends Partial<Omit<Attributes, "id">> = any> implements ModelAttributes {
-    private _id?;
-    static entity: string;
-    private _client?;
-    constructor(client?: ApiClient<typeof Model>, attributes?: CreatePayload);
-    set id(id: BigInt | number | string);
-    get id(): string | undefined;
-    /**
-     * Sets the client instance.
-     *
-     * @param {ApiClient<typeof Model> | undefined} client - The client object to be set. This must be an instance of `ApiClient` with a specific `Model` type or `undefined`.
-     */
-    set client(client: ApiClient<typeof Model> | undefined);
-    /**
-     * Retrieves the instance of the ApiClient associated with the specified model type.
-     *
-     * @return {ApiClient<typeof Model>} The configured ApiClient instance.
-     * @throws {Error} If the ApiClient has not been set.
-     */
-    get client(): ApiClient<typeof Model>;
-    private setAttributes;
-    /**
-     * Finds a model instance by its ID.
-     *
-     * @template T - The type of the model.
-     * @param {typeof Model} model - The model to find.
-     * @param {BigInt | number | string} id - The ID of the model instance to find.
-     * @returns {Promise<any | Model<T> | undefined>} A promise that resolves to the model instance if found, or undefined if not found.
-     */
-    find<T extends Attributes>(model: typeof Model, id: BigInt | number | string): Promise<ApiClientResponse<typeof Model>>;
-    /**
-     * Fetches all records based on the provided query parameters.
-     *
-     * @template T - The type of the model.
-     * @param {typeof Model} model - The model to fetch all records from.
-     * @param {QueryParams} [params={}] - Optional query parameters to filter or modify the data retrieval.
-     * @return {Promise<any[] | Model<K>[]>} Returns a promise that resolves to an array of models or raw data.
-     */
-    all<T extends Attributes>(model: typeof Model, params?: QueryParams): Promise<ApiClientResponse<typeof Model>>;
-    /**
-     * Saves the current model instance by updating or creating it based on the presence of an identifier.
-     *
-     * @template T - The type of the model.
-     * @param {typeof Model} model - The model to save.
-     * @param {CreatePayload} [attributes] - The attributes to update on the model instance.
-     * @return {Promise<Model<T>>} A promise resolving to the updated or created model instance.
-     */
-    save<T extends Attributes>(attributes?: CreatePayload): Promise<ApiClientResponse<typeof Model>>;
-    /**
-     * Updates the current model instance with the provided attributes by making an API request.
-     *
-     * @param {K} attributes - The attributes to update the model instance.
-     * @return {Promise<Model<K>>} - A promise that resolves to the updated model instance.
-     * @throws {Error} - Throws an error if the current model instance does not have an ID.
-     */
-    update<T extends Attributes>(attributes: UpdatePayload): Promise<this>;
-    /**
-     * Deletes the current record using its ID.
-     * Throws an error if the ID is not set.
-     *
-     * @return {Promise<Model<K>>} A promise that resolves to the current object after successful deletion.
-     */
-    delete(): Promise<this>;
-    /**
-     * Converts the model instance to a plain object.
-     *
-     * @return {Attributes} A plain object representation of the model instance.
-     */
-    static find<T>(client: ApiClient<typeof Model>, id: number | string | BigInt): Promise<ApiClientResponse<typeof Model>>;
-    /**
-     * Fetches all records based on the provided query parameters.
-     *
-     * @param {QueryParams} [params={}] - Optional query parameters to filter or modify the data retrieval.
-     * @return {Promise<any[] | Model<K>[]>} Returns a promise that resolves to an array of models
-     */
-    static all<T extends typeof Model>(client: ApiClient<typeof Model>, params?: QueryParams): Promise<ApiClientResponse<typeof Model>>;
+export declare abstract class Model<A extends Attributes> {
+    id?: string | number;
+    [key: string]: any;
+    static resource: string;
+    private static _queryCache;
+    constructor(data?: Partial<A>);
+    private static getQueryBuilder;
+    static query<T extends Model<any>>(this: new (...args: any[]) => T): Relation<T>;
+    static where<T extends Model<any>>(this: new (...args: any[]) => T, where: Partial<T>): Relation<T>;
+    static filter<T extends Model<any>>(this: new (...args: any[]) => T, filters: Record<string, any>): Relation<T>;
+    static include<T extends Model<any>>(this: new (...args: any[]) => T, relations: string | string[]): Relation<T>;
+    static all<T extends Model<any>>(this: new (...args: any[]) => T): Promise<T[]>;
+    static find<T extends Model<any>>(this: new (...args: any[]) => T, id: string | number): Promise<T>;
+    static create<T extends Model<any>>(this: new (...args: any[]) => T, data: Partial<T>): Promise<T>;
+    static update<T extends Model<any>>(this: new (...args: any[]) => T, id: string | number, data: Partial<T>): Promise<T>;
+    static delete(this: new (...args: any[]) => Model<any>, id: string | number): Promise<void>;
+    static firstOrCreate<T extends Model<any>>(this: new (...args: any[]) => T, where: Partial<T>, createData?: Partial<T>): Promise<T>;
+    static updateOrCreate<T extends Model<any>>(this: new (...args: any[]) => T, where: Partial<T>, updateData: Partial<T>): Promise<T>;
+    save(): Promise<this>;
+    update(data?: Partial<this>): Promise<this>;
+    delete(): Promise<void>;
 }

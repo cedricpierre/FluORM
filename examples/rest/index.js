@@ -1,4 +1,5 @@
-import { FluORM, Model } from 'fluorm';
+// Import specific components
+import { FluORM } from 'fluorm';
 
 FluORM.configure({
   baseUrl: 'https://api.example.com',
@@ -16,11 +17,3 @@ FluORM.configure({
     console.error(error);
   }
 });
-
-export class User extends Model {
-  static resource = 'users'; // The API endpoint for this model
-}
-
-const user = new User({ id: 1, name: 'John Doe' });
-user.save();
-console.log(user);

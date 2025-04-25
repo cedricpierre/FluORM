@@ -1,152 +1,132 @@
-/**
- * Represents a generic model class with attributes, payloads for creation and updating, and methods for interacting with an API client.
- *
- * @template Attributes - The type of the model's attributes. Defaults to an object with an `id` property of type `BigInt` or `string`.
- * @template CreatePayload - The type of the payload used for creating a new model instance. Defaults to the `Attributes` type without the `id` property.
- * @template UpdatePayload - The type of the payload used for updating an existing model instance. Defaults to the `Attributes` type without the `id` property.
- */
-export default class Model {
-    _id;
-    static entity;
-    _client;
-    constructor(client, attributes) {
-        this.setAttributes(attributes);
-        this.client = client;
-    }
-    set id(id) {
-        this._id = id.toString();
-    }
-    get id() {
-        return this._id;
-    }
-    /**
-     * Sets the client instance.
-     *
-     * @param {ApiClient<typeof Model> | undefined} client - The client object to be set. This must be an instance of `ApiClient` with a specific `Model` type or `undefined`.
-     */
-    set client(client) {
-        if (client) {
-            this._client = client.from(this.constructor);
+import { Builder } from './Builder';
+import { HttpClient, Methods } from './HttpClient';
+export class Model {
+    id;
+    static resource;
+    static _queryCache = new Map();
+    constructor(data) {
+        if (data) {
+            Object.assign(this, data);
         }
-    }
-    /**
-     * Retrieves the instance of the ApiClient associated with the specified model type.
-     *
-     * @return {ApiClient<typeof Model>} The configured ApiClient instance.
-     * @throws {Error} If the ApiClient has not been set.
-     */
-    get client() {
-        if (!this._client) {
-            throw new Error("ApiClient is not set!");
-        }
-        return this._client;
-    }
-    setAttributes(attributes) {
-        if (attributes) {
-            Object.assign(this, attributes);
-        }
-    }
-    /**
-     * Finds a model instance by its ID.
-     *
-     * @template T - The type of the model.
-     * @param {typeof Model} model - The model to find.
-     * @param {BigInt | number | string} id - The ID of the model instance to find.
-     * @returns {Promise<any | Model<T> | undefined>} A promise that resolves to the model instance if found, or undefined if not found.
-     */
-    async find(model, id) {
-        return await this.client
-            .from(model)
-            .id(id)
-            .get();
-    }
-    /**
-     * Fetches all records based on the provided query parameters.
-     *
-     * @template T - The type of the model.
-     * @param {typeof Model} model - The model to fetch all records from.
-     * @param {QueryParams} [params={}] - Optional query parameters to filter or modify the data retrieval.
-     * @return {Promise<any[] | Model<K>[]>} Returns a promise that resolves to an array of models or raw data.
-     */
-    async all(model, params = {}) {
-        return await this.client.from(model).get(params);
-    }
-    /**
-     * Saves the current model instance by updating or creating it based on the presence of an identifier.
-     *
-     * @template T - The type of the model.
-     * @param {typeof Model} model - The model to save.
-     * @param {CreatePayload} [attributes] - The attributes to update on the model instance.
-     * @return {Promise<Model<T>>} A promise resolving to the updated or created model instance.
-     */
-    async save(attributes) {
-        let response;
-        if (attributes) {
-            this.setAttributes(attributes);
-        }
-        if (this._id) {
-            response = await this.client
-                .from(this.constructor)
-                .id(this._id)
-                .put(this);
-        }
-        else {
-            response = await this.client
-                .from(this.constructor)
-                .post(this);
-        }
-        this.setAttributes(response.data?.data);
-        return response;
-    }
-    /**
-     * Updates the current model instance with the provided attributes by making an API request.
-     *
-     * @param {K} attributes - The attributes to update the model instance.
-     * @return {Promise<Model<K>>} - A promise that resolves to the updated model instance.
-     * @throws {Error} - Throws an error if the current model instance does not have an ID.
-     */
-    async update(attributes) {
-        if (!this._id) {
-            throw new Error("Cannot update a record without an ID");
-        }
-        this.setAttributes(attributes);
-        await this.client
-            .from(this.constructor)
-            .id(this._id)
-            .put(this);
         return this;
     }
-    /**
-     * Deletes the current record using its ID.
-     * Throws an error if the ID is not set.
-     *
-     * @return {Promise<Model<K>>} A promise that resolves to the current object after successful deletion.
-     */
+    static getQueryBuilder(modelClass) {
+        const cacheKey = modelClass.name;
+        if (!Model._queryCache.has(cacheKey)) {
+            Model._queryCache.set(cacheKey, Builder.build(() => modelClass));
+        }
+        return Model._queryCache.get(cacheKey);
+    }
+    static query() {
+        return Model.getQueryBuilder(this);
+    }
+    static where(where) {
+        return Model.getQueryBuilder(this).where(where);
+    }
+    static filter(filters) {
+        return Model.getQueryBuilder(this).filter(filters);
+    }
+    static include(relations) {
+        return Model.getQueryBuilder(this).include(relations);
+    }
+    static async all() {
+        return Model.getQueryBuilder(this).all();
+    }
+    static async find(id) {
+        if (!id)
+            throw new Error('ID is required for find operation');
+        return Model.getQueryBuilder(this).find(id);
+    }
+    static async create(data) {
+        if (!data)
+            throw new Error('Data is required for create operation');
+        return Model.getQueryBuilder(this).create(data);
+    }
+    static async update(id, data) {
+        if (!id)
+            throw new Error('ID is required for update operation');
+        if (!data)
+            throw new Error('Data is required for update operation');
+        return Model.getQueryBuilder(this).update(id, data);
+    }
+    static async delete(id) {
+        if (!id)
+            throw new Error('ID is required for delete operation');
+        return Model.getQueryBuilder(this).delete(id);
+    }
+    static async firstOrCreate(where, createData) {
+        if (!where)
+            throw new Error('Where conditions are required for firstOrCreate operation');
+        return Model.getQueryBuilder(this).firstOrCreate(where, createData);
+    }
+    static async updateOrCreate(where, updateData) {
+        if (!where)
+            throw new Error('Where conditions are required for updateOrCreate operation');
+        if (!updateData)
+            throw new Error('Update data is required for updateOrCreate operation');
+        return Model.getQueryBuilder(this).updateOrCreate(where, updateData);
+    }
+    async save() {
+        try {
+            if (this.id) {
+                return this.update();
+            }
+            const resource = this.constructor.resource;
+            if (!resource)
+                throw new Error('Resource name is not defined');
+            const data = await HttpClient.call(resource, {
+                method: Methods.POST,
+                body: { ...this }
+            });
+            Object.assign(this, data);
+            return this;
+        }
+        catch (error) {
+            if (error instanceof Error) {
+                throw new Error(`Failed to save model: ${error.message}`);
+            }
+            throw new Error('Failed to save model: Unknown error');
+        }
+    }
+    async update(data) {
+        try {
+            if (!this.id)
+                throw new Error('Cannot update a model without an ID');
+            const resource = this.constructor.resource;
+            if (!resource)
+                throw new Error('Resource name is not defined');
+            if (data)
+                Object.assign(this, data);
+            const updated = await HttpClient.call(`${resource}/${this.id}`, {
+                method: Methods.PATCH,
+                body: { ...this }
+            });
+            Object.assign(this, updated);
+            return this;
+        }
+        catch (error) {
+            if (error instanceof Error) {
+                throw new Error(`Failed to update model: ${error.message}`);
+            }
+            throw new Error('Failed to update model: Unknown error');
+        }
+    }
     async delete() {
-        if (!this._id) {
-            throw new Error("Cannot delete a record without an ID. Please set the ID before deleting the record.");
+        try {
+            if (!this.id)
+                throw new Error('Cannot delete a model without an ID');
+            const resource = this.constructor.resource;
+            if (!resource)
+                throw new Error('Resource name is not defined');
+            await HttpClient.call(`${resource}/${this.id}`, {
+                method: Methods.DELETE
+            });
         }
-        await this.client
-            .from(this.constructor)
-            .id(this._id)
-            .delete();
-        return this;
-    }
-    /**
-     * Converts the model instance to a plain object.
-     *
-     * @return {Attributes} A plain object representation of the model instance.
-     */
-    static async find(client, id) {
-        return await new this(client).find(this.constructor, id);
-    }
-    /**
-     * Fetches all records based on the provided query parameters.
-     *
-     * @param {QueryParams} [params={}] - Optional query parameters to filter or modify the data retrieval.
-     * @return {Promise<any[] | Model<K>[]>} Returns a promise that resolves to an array of models
-     */
-    static async all(client, params = {}) {
-        return await new this(client).all(this.constructor, params);
+        catch (error) {
+            if (error instanceof Error) {
+                throw new Error(`Failed to delete model: ${error.message}`);
+            }
+            throw new Error('Failed to delete model: Unknown error');
+        }
     }
 }

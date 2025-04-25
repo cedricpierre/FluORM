@@ -1,14 +1,15 @@
 {
   "name": "fluorm",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "FluORM is a fluent, model-oriented, typed REST client for TypeScript.",
-  "main": "./dist/src/index.js",
-  "types": "./dist/src/index.d.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "type": "module",
   "exports": {
     ".": {
-      "import": "./dist/src/index.js",
-      "types": "./dist/src/index.d.ts"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js"
     }
   },
   "author": "Cedric Pierre",
