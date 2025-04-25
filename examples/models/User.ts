@@ -19,6 +19,9 @@ export class User extends Model<IUser> {
     @Cast(() => Thumbnail)
     thumbnail?: Thumbnail
 
+    @Cast(() => Thumbnail)
+    thumbnails?: Thumbnail[]
+
 
     static scopes = {
         active: () => ({ status: 'active' }),

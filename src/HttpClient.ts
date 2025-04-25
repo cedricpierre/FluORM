@@ -1,4 +1,53 @@
-import { defaultOptions, type HttpClientOptions } from './HttpClientOptions'
+export class HttpClient {
+  static options: HttpClientOptions = {
+    baseUrl: '',
+    request: undefined,
+    requestInterceptor: undefined,
+    responseInterceptor: undefined,
+    errorInterceptor: undefined,
+    requestHandler: undefined
+  }
+
+  static configure(opts: Partial<HttpClientOptions>) {
+    this.options = { ...this.options, ...opts }
+  }
+
+  static async call<T = any>(
+    url: string,
+    options?: RequestOptions
+  ): Promise<T> {
+
+    if (!this.options.baseUrl) {
+      throw new Error('baseUrl is required')
+    }
+
+    url = `${this.options.baseUrl}${url}`
+
+    const finalOptions = { ...options } as RequestOptions
+    const request = { url, options: finalOptions } as Request
+
+    if (this.options.requestInterceptor) {
+      Object.assign(request, this.options.requestInterceptor.call(this, request))
+    }
+
+    let response = { data: null, error: null } as unknown as Response<T>
+
+    if (this.options.requestHandler) {
+      response = await this.options.requestHandler.call(this, request)
+    } else {
+      response = await (await fetch(request.url, request.options as RequestInit)).json();
+    } 
+
+    if (response.error) throw new Error(response.error.message)
+  
+    if (this.options.responseInterceptor) {
+      response = this.options.responseInterceptor.call(this, response)
+    }
+
+    console.log('responsesd', response)
+    return response.data
+  }
+}
 
 export const Methods = {
   GET: 'GET',
@@ -12,45 +61,38 @@ export const Methods = {
 
 export type MethodType = keyof typeof Methods;
 
-export type RequestHandler = <T = any>(
-  url: string,
-  options?: { method?: MethodType; body?: any }
-) => Promise<T>
 
-export class HttpClient {
-  static options: HttpClientOptions = defaultOptions
+interface HttpClientOptions {
+  baseUrl?: string
+  request?: RequestOptions,
+  requestInterceptor?: (request: Request) => Request
+  responseInterceptor?: (response: Response) => Response
+  errorInterceptor?: (error: Error) => void
+  requestHandler?: (request: Request) => Promise<Response>
+}
 
-  static configure(opts: Partial<HttpClientOptions>) {
-    this.options = { ...this.options, ...opts }
-  }
 
-  static async call<T = any>(
-    url: string,
-    options?: { method?: MethodType; body?: any }
-  ): Promise<T> {
-    url = `${this.options.baseUrl ?? ''}${url}`
+export interface Request {
+  url: string
+  options: RequestOptions
+}
 
-    const finalOptions = {
-      method: options?.method ?? Methods.GET,
-      body: options?.body,
-      headers: { ...this.options.headers }
-    }
+export interface Response<T = any> {
+  data: T
+  error?: Error
+}
 
-    if (this.options.requestInterceptor) {
-      const intercepted = this.options.requestInterceptor(url, finalOptions)
-      url = intercepted.url
-      Object.assign(finalOptions, intercepted.options)
-    }
-
-    const { data, error } = await (await fetch(this.options.baseUrl + url, finalOptions)).json();
-
-    if (error) throw new Error(error.message)
-    let response = data as T
-
-    if (this.options.responseInterceptor) {
-      response = await this.options.responseInterceptor(response)
-    }
-
-    return response
-  }
+export interface RequestOptions {
+  body?: any,
+  method?: MethodType,
+  headers?: Record<string, string>
+  credentials?: RequestCredentials
+  mode?: RequestMode
+  redirect?: RequestRedirect
+  referrer?: string
+  referrerPolicy?: ReferrerPolicy
+  integrity?: string
+  cache?: RequestCache
+  keepalive?: boolean
+  signal?: AbortSignal
 }

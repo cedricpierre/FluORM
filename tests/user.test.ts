@@ -1,8 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { User } from '../examples/models/User'
-import { HttpClient } from '../src/HttpClient'
+import { FluORM } from '../src/index'
 import { Media } from '../examples/models/Media'
-import { URLBuilder } from '../src/URLBuilder'
 import { Thumbnail } from '../examples/models/Thumbnail'
 
 let user: User
@@ -23,18 +22,26 @@ describe('User Model', () => {
   })
 
   it('can create a user with a thumbnail', async () => {
+    const thumbnail1 = new Thumbnail({ id: '1', size: 'sm', url: 'https://example.com/photo1.jpg' })
+    const thumbnail2 = new Thumbnail({ id: '2', size: 'md', url: 'https://example.com/photo2.jpg' })
     user = new User({ id: '123', name: 'Cedric', email: 'cedric@example.com' })
-    user.thumbnail = new Thumbnail({ id: '1', size: 'sm', url: 'https://example.com/photo1.jpg' })
+    user.thumbnail = thumbnail1
+    user.thumbnails = [thumbnail1, thumbnail2]
+
 
     expect(user).toBeInstanceOf(User)
     expect(user.id).toBe('123')
     expect(user.name).toBe('Cedric')
     expect(user.thumbnail).toBeInstanceOf(Thumbnail)
+    expect(user.thumbnails).toBeInstanceOf(Array)
+    expect(user.thumbnails).toHaveLength(2)
+    expect(user.thumbnails[0]).toBeInstanceOf(Thumbnail)
+    expect(user.thumbnails[1]).toBeInstanceOf(Thumbnail)
   
   })
 
   it('can save a user', async () => {
-    vi.spyOn(HttpClient, 'call').mockResolvedValue(1)
+    vi.spyOn(FluORM, 'call').mockResolvedValue(1)
 
     await user.save()
 
@@ -44,7 +51,7 @@ describe('User Model', () => {
   })
   
   it('can fetch all users', async () => {
-    vi.spyOn(HttpClient, 'call').mockResolvedValue([
+    vi.spyOn(FluORM, 'call').mockResolvedValue([
       { id: '1', name: 'Cedric', email: 'cedric@example.com' },
       { id: '2', name: 'Johana', email: 'johana@example.com' }
     ])
@@ -57,7 +64,7 @@ describe('User Model', () => {
   })
 
   it('can find a user by ID', async () => {
-    vi.spyOn(HttpClient, 'call').mockResolvedValue({
+    vi.spyOn(FluORM, 'call').mockResolvedValue({
       id: '123',
       name: 'Cedric',
       email: 'cedric@example.com'
@@ -71,7 +78,7 @@ describe('User Model', () => {
   })
 
   it('can fetch all medias from user', async () => {
-    vi.spyOn(HttpClient, 'call').mockResolvedValue([
+    vi.spyOn(FluORM, 'call').mockResolvedValue([
       { id: '1', name: 'Photo 1', url: 'https://example.com/photo1.jpg' },
       { id: '2', name: 'Photo 2', url: 'https://example.com/photo2.jpg' }
     ])
@@ -86,7 +93,7 @@ describe('User Model', () => {
 
 
   it('can fetch all medias from user with pagination', async () => {
-    vi.spyOn(HttpClient, 'call').mockResolvedValue([
+    vi.spyOn(FluORM, 'call').mockResolvedValue([
       { id: '1', name: 'Photo', url: 'https://example.com/photo1.jpg' }
     ])
     medias = await user.medias.where({ name: 'Photo' }).paginate(1, 1)
@@ -103,7 +110,7 @@ describe('User Model', () => {
     expect(media.id).toBe('1')
     expect(media.url).toBe('https://example.com/photo1.jpg')
 
-    vi.spyOn(HttpClient, 'call').mockResolvedValue(user)
+    vi.spyOn(FluORM, 'call').mockResolvedValue(user)
 
     const newUser = await media.user.first()
 
@@ -111,7 +118,7 @@ describe('User Model', () => {
     expect(newUser.id).toBe('123')
     expect(newUser.name).toBe('Cedric')
 
-    vi.spyOn(HttpClient, 'call').mockResolvedValue([
+    vi.spyOn(FluORM, 'call').mockResolvedValue([
       { id: '1', size: 'sm', url: 'https://example.com/photo1.jpg' }
     ])
 
@@ -122,7 +129,7 @@ describe('User Model', () => {
     expect(thumbnail.size).toBe('sm')
     expect(thumbnail.url).toBe('https://example.com/photo1.jpg')
 
-    vi.spyOn(HttpClient, 'call').mockResolvedValue([
+    vi.spyOn(FluORM, 'call').mockResolvedValue([
       { id: '1', size: 'sm', url: 'https://example.com/photo1.jpg' },
       { id: '2', size: 'md', url: 'https://example.com/photo2.jpg' }
     ])
@@ -136,7 +143,7 @@ describe('User Model', () => {
   })
 
   it('can find users where name is Cedric', async () => {
-    vi.spyOn(HttpClient, 'call').mockResolvedValue([
+    vi.spyOn(FluORM, 'call').mockResolvedValue([
       { id: '1', name: 'Cedric', email: 'cedric@example.com' }
     ])
 
