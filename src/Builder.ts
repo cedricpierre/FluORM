@@ -1,24 +1,12 @@
-import { BaseModel } from "./BaseModel"
+import { Model } from "./Model"
 import { HttpClient, Methods } from "./HttpClient"
 import { URLQueryBuilder } from "./URLQueryBuilder"
-import { URLBuilder } from "./URLBuilder"
-
-export type Relation<T> = any
-export type RelationFor<T> = T extends Array<any> ? Relation<T> : Relation<T[]>
-
-export const Relations = {
-    hasOne: 'hasOne',
-    hasMany: 'hasMany',
-    belongsTo: 'belongsTo',
-    belongsToMany: 'belongsToMany',
-} as const;
-
-export type RelationType = keyof typeof Relations;
+import { Relation, Relations, type RelationType } from "./Relations"
 
 export class Builder {
-    static build<T extends BaseModel<any>>(
+    static build<T extends Model<any>>(
         modelFactory: () => new (...args: any[]) => T,
-        parent?: BaseModel<any>,
+        parent?: Model<any>,
         key?: string | symbol,
         relationType?: RelationType,
         urlQueryBuilder?: URLQueryBuilder
@@ -55,8 +43,9 @@ export class Builder {
             }
         }
 
-        const buildUrl = (queryParams: Record<string, any> = {}) => {
-            return new URLBuilder(basePath).query({ ...query.toObject(), ...queryParams }).toString()
+        const buildUrl = () => {
+            const url = query ? `${basePath}?${new URLSearchParams(query.toObject()).toString() }` : basePath
+            return decodeURIComponent(url)
         }
 
         if (relationType === Relations.hasOne) {

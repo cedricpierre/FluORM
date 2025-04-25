@@ -1,7 +1,7 @@
 {
-  "name": "ts-api-sdk",
+  "name": "flurorm",
   "version": "1.0.0",
-  "description": "Typescript API SDK",
+  "description": "FluORM is a fluent, model-oriented, typed REST client for TypeScript.",
   "main": "dist/index.js",
   "type": "module",
   "scripts": {

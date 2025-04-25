@@ -1,7 +1,6 @@
-import { BelongsTo, HasMany } from '../../src/decorators'
+import { Relation, Model, BelongsTo, Attributes, HasMany } from '../../src/index'
+
 import { User } from './User'
-import { Attributes, BaseModel } from '../../src/BaseModel'
-import { Relation } from '../../src/Builder'
 import { Thumbnail } from './Thumbnail'
 
 export interface IMedia extends Attributes {
@@ -13,7 +12,7 @@ export interface IMedia extends Attributes {
     url: string
 }
 
-export class Media extends BaseModel<IMedia> {
+export class Media extends Model<IMedia> {
     static resource = 'medias'
 
     @BelongsTo(() => User as any)

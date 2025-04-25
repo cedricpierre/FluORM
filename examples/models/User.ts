@@ -1,8 +1,6 @@
-import { Cast, HasMany } from './../../src/decorators'
+import { Relation, Model, BelongsTo, Attributes, HasMany, Cast } from '../../src/index'
+
 import { Media } from './Media'
-import { BaseModel } from '../../src/BaseModel'
-import { Relation } from '../../src/Builder'
-import { type Attributes } from '../../src/BaseModel'
 import { Thumbnail } from './Thumbnail'
 
 interface IUser extends Attributes {
@@ -12,7 +10,7 @@ interface IUser extends Attributes {
     updated_at?: string
 }
 
-export class User extends BaseModel<IUser> {
+export class User extends Model<IUser> {
     static resource = 'users'
 
     @HasMany(() => Media as any)

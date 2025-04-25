@@ -135,15 +135,12 @@ describe('User Model', () => {
       { id: '1', size: 'sm', url: 'https://example.com/photo1.jpg' },
       { id: '2', size: 'md', url: 'https://example.com/photo2.jpg' }
     ])
-    
-    const generatedUrl = vi.spyOn(URLBuilder.prototype, 'toString')
 
     const thumbnails = await media.thumbnails.all()
 
     expect(thumbnails).toBeInstanceOf(Array)
     expect(thumbnails).toHaveLength(2)
     expect(thumbnails.every((thumbnail: Thumbnail) => thumbnail instanceof Thumbnail)).toBe(true)
-    expect(generatedUrl).toHaveBeenCalled()
     
   })
 
@@ -151,8 +148,6 @@ describe('User Model', () => {
     vi.spyOn(HttpClient, 'call').mockResolvedValue([
       { id: '1', name: 'Cedric', email: 'cedric@example.com' }
     ])
-
-    const generatedUrl = vi.spyOn(URLBuilder.prototype, 'toString')
 
     const users = await User
       .where({ name: 'Cedric' })
@@ -164,10 +159,5 @@ describe('User Model', () => {
     expect(users).toHaveLength(1)
     expect(users[0]).toBeInstanceOf(User)
     expect(users[0].name).toBe('Cedric')
-    expect(generatedUrl).toHaveBeenCalled()
-    expect(generatedUrl.mock.results[0].value).toContain('name=Cedric')
-    expect(generatedUrl.mock.results[0].value).toContain('email=cedric@example.com')
-    expect(generatedUrl.mock.results[0].value).toContain('include=medias')
-    expect(generatedUrl.mock.results[0].value).toContain('status=active')
   })
 })

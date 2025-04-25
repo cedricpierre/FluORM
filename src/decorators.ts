@@ -1,15 +1,16 @@
-import { Builder, Relations, RelationType } from './Builder'
-import type { BaseModel } from './BaseModel'
+import { Builder } from './Builder'
+import type { Model } from './Model'
+import { Relations, type RelationType } from './Relations';
 
-export const makeRelation = (
-    modelFactory: () => new (...args: any[]) => BaseModel<any>,
+const makeRelation = (
+    modelFactory: () => new (...args: any[]) => Model<any>,
     type: RelationType
 ) => {
     
     return function (target: any, key: string | symbol) {
         // Initialize the property on the prototype
         Object.defineProperty(target, key, {
-            get(this: BaseModel<any>) {
+            get(this: Model<any>) {
                 return Builder.build<any>(
                     modelFactory,
                     this,
@@ -70,11 +71,11 @@ export const Cast = (caster: CastInput) => {
 }
 
 // Aliases
-export const HasOne = (model: () => BaseModel<any>) => {
+export const HasOne = (model: () => Model<any>) => {
     return makeRelation(model as any, Relations.hasOne)
 }
 
-export const HasMany = (model: () => BaseModel<any>) => {
+export const HasMany = (model: () => Model<any>) => {
     return makeRelation(model as any, Relations.hasMany)
 }
 
