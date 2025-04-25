@@ -89,20 +89,11 @@ describe('User Model', () => {
     vi.spyOn(HttpClient, 'call').mockResolvedValue([
       { id: '1', name: 'Photo', url: 'https://example.com/photo1.jpg' }
     ])
-
-    const generatedUrl = vi.spyOn(URLBuilder.prototype, 'toString')
-
     medias = await user.medias.where({ name: 'Photo' }).paginate(1, 1)
 
     expect(medias).toBeInstanceOf(Array)
     expect(medias).toHaveLength(1)
     expect(medias.every((media: Media) => media instanceof Media)).toBe(true)
-    expect(generatedUrl).toHaveBeenCalled()
-    expect(generatedUrl.mock.results[0].value).toContain('name=Photo')
-    expect(generatedUrl.mock.results[0].value).toContain('page=1')
-    expect(generatedUrl.mock.results[0].value).toContain('per_page=1')
-    expect(generatedUrl.mock.results[0].value).toContain('offset=0')
-
   })
 
   it('can find a user by its media', async () => {

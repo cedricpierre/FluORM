@@ -1,4 +1,4 @@
-import { Relation, Model, BelongsTo, Attributes, HasMany, Cast } from '../../src/index'
+import { Relation, Model, Attributes, HasMany, Cast } from '../../src/index'
 
 import { Media } from './Media'
 import { Thumbnail } from './Thumbnail'
