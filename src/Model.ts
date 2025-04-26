@@ -1,6 +1,5 @@
-import { Builder } from './Builder'
+import { RelationBuilder, type Relation } from './RelationBuilder'
 import { HttpClient, Methods } from './HttpClient'
-import { Relation } from './Relations'
 
 export interface Attributes extends Record<string, any> {
   id?: string | number
@@ -23,7 +22,7 @@ export abstract class Model<A extends Attributes> {
   private static getQueryBuilder<T extends Model<any>>(modelClass: new (...args: any[]) => T): Relation<T> {
     const cacheKey = modelClass.name
     if (!Model._queryCache.has(cacheKey)) {
-      Model._queryCache.set(cacheKey, Builder.build(() => modelClass))
+      Model._queryCache.set(cacheKey, RelationBuilder.build(() => modelClass))
     }
     return Model._queryCache.get(cacheKey)
   }

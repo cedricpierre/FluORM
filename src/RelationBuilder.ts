@@ -1,20 +1,32 @@
 import { Model } from "./Model"
 import { HttpClient, Methods } from "./HttpClient"
 import { URLQueryBuilder } from "./URLQueryBuilder"
-import { Relation, Relations, type RelationType } from "./Relations"
 
-export class Builder {
+export type Relation<T> = any
+export type RelationFor<T> = T extends Array<any> ? Relation<T> : Relation<T[]>
+
+export const Relations = {
+    hasOne: 'hasOne',
+    hasMany: 'hasMany',
+    belongsTo: 'belongsTo',
+    belongsToMany: 'belongsToMany',
+} as const;
+
+export type RelationType = keyof typeof Relations;
+
+export class RelationBuilder {
     static build<T extends Model<any>>(
         modelFactory: () => new (...args: any[]) => T,
         parent?: Model<any>,
         key?: string | symbol,
         relationType?: RelationType,
-        urlQueryBuilder?: URLQueryBuilder
-    ) {
+        urlQueryBuilder?: URLQueryBuilder,
+        resource?: string
+    ): Relation<T> {
         const query = urlQueryBuilder ?? new URLQueryBuilder()
         const RelatedModel = modelFactory()
 
-        let basePath = (RelatedModel as any).resource
+        let basePath = resource ?? (RelatedModel as any).resource
         
         if(parent?.id) {
             basePath += `/${parent.id}`
@@ -25,12 +37,12 @@ export class Builder {
         }
 
         const queryBuilder: any = {
-            where: (where: Record<string, any>) => { query.where(where); return this.build(modelFactory, parent, key, relationType, query) },
-            filter: (filters: Record<string, any>) => { query.filter(filters); return this.build(modelFactory, parent, key, relationType, query) },
-            include: (relations: string | string[]) => { query.include(relations); return this.build(modelFactory, parent, key, relationType, query) },
-            orderBy: (field: string, dir: string = 'asc') => { query.orderBy(field, dir); return this.build(modelFactory, parent, key, relationType, query) },
-            limit: (n: number) => { query.limit(n); return this.build(modelFactory, parent, key, relationType, query) },
-            offset: (n: number) => { query.offset(n); return this.build(modelFactory, parent, key, relationType, query) },
+            where: (where: Record<string, any>) => { query.where(where); return this.build(modelFactory, parent, key, relationType, query, resource) },
+            filter: (filters: Record<string, any>) => { query.filter(filters); return this.build(modelFactory, parent, key, relationType, query, resource) },
+            include: (relations: string | string[]) => { query.include(relations); return this.build(modelFactory, parent, key, relationType, query, resource) },
+            orderBy: (field: string, dir: string = 'asc') => { query.orderBy(field, dir); return this.build(modelFactory, parent, key, relationType, query, resource) },
+            limit: (n: number) => { query.limit(n); return this.build(modelFactory, parent, key, relationType, query, resource) },
+            offset: (n: number) => { query.offset(n); return this.build(modelFactory, parent, key, relationType, query, resource) },
         }
 
         // 💡 Injection des scopes dynamiques
@@ -38,7 +50,7 @@ export class Builder {
             if (typeof fn === 'function') {
                 queryBuilder[name] = (...args: any[]) => {
                     query.filter(fn(...args))
-                    return this.build(modelFactory, parent, key, relationType, query)
+                    return this.build(modelFactory, parent, key, relationType, query, resource)
                 }
             }
         }

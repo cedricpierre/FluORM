@@ -1,21 +1,23 @@
-import { Builder } from './Builder'
+import { RelationBuilder, Relations, type RelationType } from './RelationBuilder'
 import type { Model } from './Model'
-import { Relations, type RelationType } from './Relations';
 
 const makeRelation = (
     modelFactory: () => new (...args: any[]) => Model<any>,
-    type: RelationType
+    type: RelationType,
+    resource?: string
 ) => {
     
     return function (target: any, key: string | symbol) {
         // Initialize the property on the prototype
         Object.defineProperty(target, key, {
             get(this: Model<any>) {
-                return Builder.build<any>(
+                return RelationBuilder.build<any>(
                     modelFactory,
                     this,
                     key,
                     type,
+                    undefined,
+                    resource
                 );
             },
             enumerable: true,
@@ -71,12 +73,12 @@ export const Cast = (caster: CastInput) => {
 }
 
 // Aliases
-export const HasOne = (model: () => Model<any>) => {
-    return makeRelation(model as any, Relations.hasOne)
+export const HasOne = (model: () => Model<any>, resource?: string) => {
+    return makeRelation(model as any, Relations.hasOne, resource)
 }
 
-export const HasMany = (model: () => Model<any>) => {
-    return makeRelation(model as any, Relations.hasMany)
+export const HasMany = (model: () => Model<any>, resource?: string) => {
+    return makeRelation(model as any, Relations.hasMany, resource)
 }
 
 export const BelongsTo = HasOne

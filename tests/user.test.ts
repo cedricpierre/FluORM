@@ -6,9 +6,9 @@ import { Thumbnail } from '../examples/models/Thumbnail'
 
 let user: User
 let medias: Media[]
-
+const baseUrl = 'http://localhost:3000'
 FluORM.configure({
-  baseUrl: 'http://localhost:3000'
+  baseUrl
 })
 
 describe('User Model', () => {
@@ -185,7 +185,12 @@ describe('User Model', () => {
   it('generates correct URL with query parameters', async () => {
     const mockCall = vi.spyOn(FluORM, 'call')
     mockCall.mockImplementation((url) => {
-      expect(url).toBe(url)
+      expect(url.startsWith(baseUrl)).toBeTruthy()
+      expect(url.includes('name=Cedric')).toBeTruthy()
+      expect(url.includes('email=cedric@example.com')).toBeTruthy()
+      expect(url.includes('include=medias')).toBeTruthy()
+      expect(url.includes('page=1')).toBeTruthy()
+      expect(url.includes('per_page=10')).toBeTruthy()
       return Promise.resolve([])
     })
 
