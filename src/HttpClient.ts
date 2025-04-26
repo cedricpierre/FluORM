@@ -21,7 +21,7 @@ export class HttpClient {
       throw new Error('baseUrl is required')
     }
 
-    url = `${this.options.baseUrl}${url}`
+    url = `${this.options.baseUrl}/${url}`
 
     const finalOptions = { ...options } as RequestOptions
     const request = { url, options: finalOptions } as Request
@@ -35,7 +35,10 @@ export class HttpClient {
     if (this.options.requestHandler) {
       response = await this.options.requestHandler.call(this, request)
     } else {
-      response = await (await fetch(request.url, request.options as RequestInit)).json();
+      const resp = await fetch(request.url, request.options as RequestInit);
+      if (resp.ok) {
+        response = await resp.json();
+      }
     }
 
     if (response.error) throw new Error(response.error.message)

@@ -45,7 +45,7 @@ describe('FluORM Class', () => {
         }
         
         FluORM.configure({ requestHandler: handler })
-        const response = await FluORM.call('/users', { method: 'GET' })
+        const response = await FluORM.call('users', { method: 'GET' })
         expect(response).toBe(true)
         expect(FluORM.options.requestHandler).toBe(handler)
     })
@@ -61,21 +61,21 @@ describe('FluORM Class', () => {
     it('can call a GET request', async () => {
         vi.spyOn(FluORM, 'call').mockResolvedValue(true)
 
-        const response = await FluORM.call('/users')
+        const response = await FluORM.call('users')
         expect(response).toBeDefined()
     })
     
     it('can call a POST request', async () => {
         vi.spyOn(FluORM, 'call').mockResolvedValue(true)
 
-        const response = await FluORM.call('/users', { method: 'POST' })
+        const response = await FluORM.call('users', { method: 'POST' })
         expect(response).toBeDefined()
     })
 
     it('can call a PUT request', async () => {
         vi.spyOn(FluORM, 'call').mockResolvedValue(true)
 
-        const response = await FluORM.call('/users', { method: 'PUT' })
+        const response = await FluORM.call('users', { method: 'PUT' })
         expect(response).toBeDefined()
     })  
 
@@ -83,28 +83,28 @@ describe('FluORM Class', () => {
     it('can call a PATCH request', async () => {
         vi.spyOn(FluORM, 'call').mockResolvedValue(true)
 
-        const response = await FluORM.call('/users', { method: 'PATCH' })
+        const response = await FluORM.call('users', { method: 'PATCH' })
         expect(response).toBeDefined()
     })  
 
     it('can call a DELETE request', async () => {
         vi.spyOn(FluORM, 'call').mockResolvedValue(true)
 
-        const response = await FluORM.call('/users', { method: 'DELETE' })
+        const response = await FluORM.call('users', { method: 'DELETE' })
         expect(response).toBeDefined()
     })  
 
     it('can call a HEAD request', async () => {
         vi.spyOn(FluORM, 'call').mockResolvedValue(true)
 
-        const response = await FluORM.call('/users', { method: 'HEAD' })
+        const response = await FluORM.call('users', { method: 'HEAD' })
         expect(response).toBeDefined()
     })    
 
     it('can call a OPTIONS request', async () => {
         vi.spyOn(FluORM, 'call').mockResolvedValue(true)
 
-        const response = await FluORM.call('/users', { method: 'OPTIONS' })
+        const response = await FluORM.call('users', { method: 'OPTIONS' })
         expect(response).toBeDefined()
     })
     

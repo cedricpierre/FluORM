@@ -204,4 +204,47 @@ describe('User Model', () => {
 
     expect(mockCall).toHaveBeenCalled()
   })
+
+  it('generates correct URL with relation and query parameters', async () => {
+
+    vi.spyOn(FluORM, 'call').mockResolvedValue({
+      id: '1',
+      name: 'Cedric',
+      email: 'cedric@example.com'
+    })
+
+    const user = await User.find(1)
+
+    vi.spyOn(FluORM, 'call').mockImplementation((url) => {
+      expect(url).toBe(`${baseUrl}/users/1/medias?include=thumbnails`)
+      expect(url.includes('include=thumbnails')).toBeTruthy()
+      return Promise.resolve([])
+    }).mockResolvedValue({
+      id: '2',
+      name: 'thumbnail',
+      url: 'https://example.com/thumbnail.jpg'
+    })    
+    
+    const media = await user.medias.find(2)
+
+    expect(media).toBeInstanceOf(Media)
+    expect(media.id).toBe('2')
+    expect(media.name).toBe('thumbnail')
+    expect(media.url).toBe('https://example.com/thumbnail.jpg')
+
+    vi.spyOn(FluORM, 'call').mockImplementation((url) => {
+      expect(url).toBe(`${baseUrl}/medias/2/thumbnails?include=size`)
+      expect(url.includes('include=size')).toBeTruthy()
+      return Promise.resolve([])
+    }).mockResolvedValue([
+      { id: '1', size: 'sm', url: 'https://example.com/thumbnail1.jpg' },
+      { id: '2', size: 'md', url: 'https://example.com/thumbnail2.jpg' }
+    ])    
+
+    const thumbnails = await media.thumbnails.include('size').all()
+
+    expect(thumbnails).toBeInstanceOf(Array)
+    expect(thumbnails).toHaveLength(2)
+    expect(thumbnails.every((thumbnail: Thumbnail) => thumbnail instanceof Thumbnail)).toBe(true)
+  })
 })

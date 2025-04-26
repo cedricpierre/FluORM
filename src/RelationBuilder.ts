@@ -23,11 +23,11 @@ export class RelationBuilder {
         urlQueryBuilder?: URLQueryBuilder,
         resource?: string
     ): Relation<T> {
+
         const query = urlQueryBuilder ?? new URLQueryBuilder()
         const RelatedModel = modelFactory()
 
-        let basePath = resource ?? (RelatedModel as any).resource
-        
+        let basePath = resource ?? (parent?.constructor as any)?.resource ?? (RelatedModel as any).resource
         if(parent?.id) {
             basePath += `/${parent.id}`
         }
@@ -56,7 +56,8 @@ export class RelationBuilder {
         }
 
         const buildUrl = () => {
-            const url = query ? `${basePath}?${new URLSearchParams(query.toObject()).toString() }` : basePath
+            const queryObject = query.toObject()
+            const url = Object.keys(queryObject).length > 0 ? `${basePath}?${new URLSearchParams(queryObject).toString() }` : basePath
             query.reset()
             return decodeURIComponent(`${HttpClient.options.baseUrl}/${url}`)
         }
