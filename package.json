@@ -1,6 +1,6 @@
 {
   "name": "fluorm",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "FluORM is a fluent, model-oriented, typed REST client for TypeScript.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
