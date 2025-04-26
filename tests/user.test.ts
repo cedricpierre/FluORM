@@ -185,7 +185,7 @@ describe('User Model', () => {
   it('generates correct URL with query parameters', async () => {
     const mockCall = vi.spyOn(FluORM, 'call')
     mockCall.mockImplementation((url) => {
-      console.log(url)
+      expect(url).toBe(`${baseUrl}/users?name=Cedric&email=cedric@example.com&include=medias,profile&sort=-created_at&limit=10&offset=0&page=1&per_page=10`)
       expect(url.startsWith(baseUrl)).toBeTruthy()
       expect(url.includes('name=Cedric')).toBeTruthy()
       expect(url.includes('email=cedric@example.com')).toBeTruthy()
@@ -197,7 +197,6 @@ describe('User Model', () => {
 
     await User
       .where({ name: 'Cedric' })
-      .filter({ email: 'cedric@example.com' })
       .filter({ email: 'cedric@example.com' })
       .include(['medias', 'profile'])
       .orderBy('created_at', 'desc')
