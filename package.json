@@ -15,8 +15,7 @@
   "email": "jirotoh@gmail.com",
   "scripts": {
     "build": "tsc",
-    "test": "vitest",
-    "publish": "npm run build && npm version patch && npm publish"
+    "test": "vitest"
   },
   "repository": {
     "type": "git",
