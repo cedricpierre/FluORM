@@ -1,4 +1,4 @@
-import { Relation } from './Relations';
+import { type Relation } from './RelationBuilder';
 export interface Attributes extends Record<string, any> {
     id?: string | number;
 }

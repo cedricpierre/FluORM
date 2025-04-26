@@ -1,4 +1,4 @@
-import { Builder } from './Builder';
+import { RelationBuilder } from './RelationBuilder';
 import { HttpClient, Methods } from './HttpClient';
 export class Model {
     id;
@@ -13,7 +13,7 @@ export class Model {
     static getQueryBuilder(modelClass) {
         const cacheKey = modelClass.name;
         if (!Model._queryCache.has(cacheKey)) {
-            Model._queryCache.set(cacheKey, Builder.build(() => modelClass));
+            Model._queryCache.set(cacheKey, RelationBuilder.build(() => modelClass));
         }
         return Model._queryCache.get(cacheKey);
     }

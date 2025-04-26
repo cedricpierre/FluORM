@@ -1,11 +1,10 @@
-import { Builder } from './Builder';
-import { Relations } from './Relations';
-const makeRelation = (modelFactory, type) => {
+import { RelationBuilder, Relations } from './RelationBuilder';
+const makeRelation = (modelFactory, type, resource) => {
     return function (target, key) {
         // Initialize the property on the prototype
         Object.defineProperty(target, key, {
             get() {
-                return Builder.build(modelFactory, this, key, type);
+                return RelationBuilder.build(modelFactory, this, key, type, undefined, resource);
             },
             enumerable: true,
             configurable: true,
@@ -48,11 +47,11 @@ export const Cast = (caster) => {
     };
 };
 // Aliases
-export const HasOne = (model) => {
-    return makeRelation(model, Relations.hasOne);
+export const HasOne = (model, resource) => {
+    return makeRelation(model, Relations.hasOne, resource);
 };
-export const HasMany = (model) => {
-    return makeRelation(model, Relations.hasMany);
+export const HasMany = (model, resource) => {
+    return makeRelation(model, Relations.hasMany, resource);
 };
 export const BelongsTo = HasOne;
 export const BelongsToMany = HasMany;
