@@ -36,6 +36,7 @@ export class RelationBuilder {
         }
         const buildUrl = () => {
             const url = query ? `${basePath}?${new URLSearchParams(query.toObject()).toString()}` : basePath;
+            query.reset();
             return decodeURIComponent(`${HttpClient.options.baseUrl}/${url}`);
         };
         if (relationType === Relations.hasOne) {

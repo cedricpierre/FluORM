@@ -6,6 +6,7 @@ export declare class URLQueryBuilder {
     private _offset?;
     private _page?;
     private _perPage?;
+    reset(): this;
     where(obj: Record<string, any>): this;
     filter(obj: Record<string, any>): this;
     include(rel: string | string[]): this;

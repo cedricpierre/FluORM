@@ -32,7 +32,6 @@ export class HttpClient {
         if (this.options.responseInterceptor) {
             response = this.options.responseInterceptor.call(this, response);
         }
-        console.log('responsesd', response);
         return response.data;
     }
 }

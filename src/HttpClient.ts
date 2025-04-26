@@ -36,15 +36,14 @@ export class HttpClient {
       response = await this.options.requestHandler.call(this, request)
     } else {
       response = await (await fetch(request.url, request.options as RequestInit)).json();
-    } 
+    }
 
     if (response.error) throw new Error(response.error.message)
   
     if (this.options.responseInterceptor) {
       response = this.options.responseInterceptor.call(this, response)
     }
-
-    console.log('responsesd', response)
+    
     return response.data
   }
 }

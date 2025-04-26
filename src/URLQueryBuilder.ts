@@ -7,6 +7,17 @@ export class URLQueryBuilder {
     private _page?: number
     private _perPage?: number
 
+    reset(): this {
+        this._filters = {}
+        this._includes = []
+        this._sort = []
+        this._limit = undefined
+        this._offset = undefined
+        this._page = undefined
+        this._perPage = undefined
+        return this
+    }
+    
     where(obj: Record<string, any>): this {
         return this.filter(obj)
     }

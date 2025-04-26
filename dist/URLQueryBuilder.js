@@ -6,6 +6,16 @@ export class URLQueryBuilder {
     _offset;
     _page;
     _perPage;
+    reset() {
+        this._filters = {};
+        this._includes = [];
+        this._sort = [];
+        this._limit = undefined;
+        this._offset = undefined;
+        this._page = undefined;
+        this._perPage = undefined;
+        return this;
+    }
     where(obj) {
         return this.filter(obj);
     }
