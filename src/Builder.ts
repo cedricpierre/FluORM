@@ -14,7 +14,7 @@ export class Builder {
         const query = urlQueryBuilder ?? new URLQueryBuilder()
         const RelatedModel = modelFactory()
 
-        let basePath = `${HttpClient.options.baseUrl}/${(RelatedModel as any).resource}`
+        let basePath = (RelatedModel as any).resource
         
         if(parent?.id) {
             basePath += `/${parent.id}`
@@ -45,7 +45,7 @@ export class Builder {
 
         const buildUrl = () => {
             const url = query ? `${basePath}?${new URLSearchParams(query.toObject()).toString() }` : basePath
-            return decodeURIComponent(url)
+            return decodeURIComponent(`${HttpClient.options.baseUrl}/${url}`)
         }
 
         if (relationType === Relations.hasOne) {

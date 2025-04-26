@@ -7,17 +7,40 @@ import { Thumbnail } from '../examples/models/Thumbnail'
 let user: User
 let medias: Media[]
 
+FluORM.configure({
+  baseUrl: 'http://localhost:3000'
+})
+
 describe('User Model', () => {
   beforeEach(() => {
     vi.restoreAllMocks()
   })
 
+  
+
   it('can create a user', async () => {
-    user = new User({ id: '123', name: 'Cedric', email: 'cedric@example.com' })
-    
+    vi.spyOn(FluORM, 'call').mockResolvedValue(
+      { id: '123', name: 'Cedric', email: 'cedric@example.com' }
+    )
+
+    user = new User({ name: 'Cedric', email: 'cedric@example.com' })
+    await user.save()
+
     expect(user).toBeInstanceOf(User)
     expect(user.id).toBe('123')
     expect(user.name).toBe('Cedric')
+
+    vi.spyOn(FluORM, 'call').mockResolvedValue([
+      { id: '123', name: 'Cedric', email: 'cedric@example.com' }
+    ])
+
+    const users = await User.all()
+
+    expect(users).toBeInstanceOf(Array)
+    expect(users).toHaveLength(1)
+    expect(users[0]).toBeInstanceOf(User)
+    expect(users[0].id).toBe('123')
+    expect(users[0].name).toBe('Cedric')
   
   })
 
@@ -157,5 +180,22 @@ describe('User Model', () => {
     expect(users).toHaveLength(1)
     expect(users[0]).toBeInstanceOf(User)
     expect(users[0].name).toBe('Cedric')
+  })
+
+  it('generates correct URL with query parameters', async () => {
+    const mockCall = vi.spyOn(FluORM, 'call')
+    mockCall.mockImplementation((url) => {
+      expect(url).toBe(url)
+      return Promise.resolve([])
+    })
+
+    await User
+      .where({ name: 'Cedric' })
+      .filter({ email: 'cedric@example.com' })
+      .include(['medias', 'profile'])
+      .orderBy('created_at', 'desc')
+      .paginate(1, 10)
+
+    expect(mockCall).toHaveBeenCalled()
   })
 })
