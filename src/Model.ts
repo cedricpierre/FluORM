@@ -1,6 +1,5 @@
 import { RelationBuilder, type Relation } from './RelationBuilder'
 import { HttpClient, Methods } from './HttpClient'
-
 export interface Attributes extends Record<string, any> {
   id?: string | number
 }
@@ -149,5 +148,26 @@ export abstract class Model<A extends Attributes> {
       }
       throw new Error('Failed to delete model: Unknown error')
     }
+  }
+
+  toObject(): Record<string, any> {
+    const obj: Record<string, any> = {}
+
+    Object.keys(this).forEach(key => {
+      obj[key] = this[key as keyof this]
+    })
+
+    const descriptors = Object.getOwnPropertyDescriptors(Object.getPrototypeOf(this))
+    for (const [key, descriptor] of Object.entries(descriptors)) {
+      if (descriptor.get) {
+        const value = this[key as keyof this] as any
+        if (value instanceof Model) {
+          obj[key] = value.toObject()
+        } else if (Array.isArray(value) && value.length > 0) {
+          obj[key] = value.filter((item: any) => item instanceof Model).map((item: Model<any>) => item.toObject())
+        }
+      }
+    }
+    return obj
   }
 }

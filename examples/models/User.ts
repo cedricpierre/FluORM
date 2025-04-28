@@ -1,4 +1,5 @@
-import { Relation, Model, Attributes, HasMany, Cast } from '../../src/index'
+import { Model, Attributes, HasMany, Cast } from '../../src/index'
+import { Relation } from '../../src/RelationBuilder'
 
 import { Media } from './Media'
 import { Thumbnail } from './Thumbnail'
@@ -14,13 +15,13 @@ export class User extends Model<IUser> {
     static resource = 'users'
 
     @HasMany(() => Media as any)
-    declare medias: Relation<Media[]>;
+    declare medias!: Relation<Media[]>;
 
     @Cast(() => Thumbnail)
-    thumbnail?: Thumbnail
+    declare thumbnail!: Thumbnail
 
     @Cast(() => Thumbnail)
-    thumbnails?: Thumbnail[]
+    declare thumbnails!: Thumbnail[]
 
 
     static scopes = {

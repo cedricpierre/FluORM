@@ -27,11 +27,10 @@ export class RelationBuilder {
         const RelatedModel = modelFactory()
 
         let basePath = resource ?? (parent as any)?.resource ?? (RelatedModel as any).resource
+        
         if(parent) {
             basePath = `${parent.resource}/${basePath}`
         }
-
-        console.log('basePath', basePath, parent)
 
         const queryBuilder: any = {
             id: (id: string | number) => { 

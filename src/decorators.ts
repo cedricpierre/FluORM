@@ -1,5 +1,5 @@
 import { RelationBuilder, Relations, type RelationType } from './RelationBuilder'
-import type { Model } from './Model'
+import { Model } from './Model'
 
 const makeRelation = (
     modelFactory: () => new (...args: any[]) => Model<any>,
@@ -25,51 +25,51 @@ const makeRelation = (
     }
 }
 
-type CastInput =
-    | ((val?: any) => any)                       // fonction custom
-    | (() => any)                               // constructeur simple
-    | (() => [any]);                            // constructeur tableau
+export const Cast = (caster: () => new (...args: any[]) => any) => {
+    return function (target: any, key: string) {
+        // Create a unique symbol for each instance
+        const privateKey = Symbol(key);
 
-export const Cast = (caster: CastInput) => {
-    return function (target: any, propertyKey: string) {
-        const privateKey = Symbol(propertyKey);
+        // Initialize the property on the prototype
+        Object.defineProperty(target, key, {
+            get(this: any) {
+                if (!this[privateKey]) {
+                    this[privateKey] = undefined;
+                }
+                const value = this[privateKey];
+                if (!value) return value;
+                
+                const ModelClass = caster();
+                if (!ModelClass) return value;
 
-        let transformer: (val: any) => any;
-
-        // If it's an object factory
-        if (typeof caster === 'function') {
-            const sample = caster();
-
-            if (Array.isArray(sample)) {
-                const ItemType = sample[0];
-                transformer = (val) =>
-                    Array.isArray(val)
-                        ? val.map((v) =>
-                            v instanceof ItemType ? v : Object.assign(new ItemType(), v)
-                        )
-                        : [];
-            } else if (typeof sample === 'object') {
-                transformer = (val) =>
-                    val instanceof sample.constructor ? val : Object.assign(new sample.constructor(), val);
-            } else {
-                transformer = caster as (val: any) => any;
-            }
-        } else {
-            transformer = caster as (val: any) => any;
-        }
-
-        Object.defineProperty(target, propertyKey, {
-            get() {
-                return this[privateKey];
+                if (Array.isArray(value)) {
+                    return value.map(item => item instanceof ModelClass ? item : new ModelClass(item));
+                } else if (value instanceof ModelClass) {
+                    return value;
+                } else {
+                    return new ModelClass(value);
+                }
             },
-            set(value: any) {
-                this[privateKey] = transformer(value);
+            set(this: any, value: any) {
+                const ModelClass = caster();
+                if (!ModelClass) {
+                    this[privateKey] = value;
+                    return;
+                }
+
+                if (Array.isArray(value)) {
+                    this[privateKey] = value.map(item => item instanceof ModelClass ? item : new ModelClass(item));
+                } else if (value instanceof ModelClass) {
+                    this[privateKey] = value;
+                } else {
+                    this[privateKey] = new ModelClass(value);
+                }
             },
             enumerable: true,
             configurable: true,
         });
     };
-}
+};
 
 // Aliases
 export const HasOne = (model: () => Model<any>, resource?: string) => {
