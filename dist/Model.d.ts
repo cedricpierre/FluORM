@@ -8,7 +8,8 @@ export declare abstract class Model<A extends Attributes> {
     static resource: string;
     private static _queryCache;
     constructor(data?: Partial<A>);
-    private static getQueryBuilder;
+    private static getRelationBuilder;
+    static id<T extends Model<any>>(this: new (...args: any[]) => T, id: string | number): Relation<T>;
     static query<T extends Model<any>>(this: new (...args: any[]) => T): Relation<T>;
     static where<T extends Model<any>>(this: new (...args: any[]) => T, where: Partial<T>): Relation<T>;
     static filter<T extends Model<any>>(this: new (...args: any[]) => T, filters: Record<string, any>): Relation<T>;

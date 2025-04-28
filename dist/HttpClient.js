@@ -14,7 +14,7 @@ export class HttpClient {
         if (!this.options.baseUrl) {
             throw new Error('baseUrl is required');
         }
-        url = `${this.options.baseUrl}${url}`;
+        url = `${this.options.baseUrl}/${url}`;
         const finalOptions = { ...options };
         const request = { url, options: finalOptions };
         if (this.options.requestInterceptor) {
@@ -25,7 +25,10 @@ export class HttpClient {
             response = await this.options.requestHandler.call(this, request);
         }
         else {
-            response = await (await fetch(request.url, request.options)).json();
+            const resp = await fetch(request.url, request.options);
+            if (resp.ok) {
+                response = await resp.json();
+            }
         }
         if (response.error)
             throw new Error(response.error.message);

@@ -4,7 +4,7 @@ const makeRelation = (modelFactory, type, resource) => {
         // Initialize the property on the prototype
         Object.defineProperty(target, key, {
             get() {
-                return RelationBuilder.build(modelFactory, this, key, type, undefined, resource);
+                return RelationBuilder.build(modelFactory, this, type, undefined, resource ?? String(key));
             },
             enumerable: true,
             configurable: true,

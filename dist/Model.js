@@ -10,61 +10,64 @@ export class Model {
         }
         return this;
     }
-    static getQueryBuilder(modelClass) {
+    static getRelationBuilder(modelClass) {
         const cacheKey = modelClass.name;
         if (!Model._queryCache.has(cacheKey)) {
             Model._queryCache.set(cacheKey, RelationBuilder.build(() => modelClass));
         }
         return Model._queryCache.get(cacheKey);
     }
+    static id(id) {
+        return Model.getRelationBuilder(this).id(id);
+    }
     static query() {
-        return Model.getQueryBuilder(this);
+        return Model.getRelationBuilder(this);
     }
     static where(where) {
-        return Model.getQueryBuilder(this).where(where);
+        return Model.getRelationBuilder(this).where(where);
     }
     static filter(filters) {
-        return Model.getQueryBuilder(this).filter(filters);
+        return Model.getRelationBuilder(this).filter(filters);
     }
     static include(relations) {
-        return Model.getQueryBuilder(this).include(relations);
+        return Model.getRelationBuilder(this).include(relations);
     }
     static async all() {
-        return Model.getQueryBuilder(this).all();
+        return Model.getRelationBuilder(this).all();
     }
     static async find(id) {
         if (!id)
             throw new Error('ID is required for find operation');
-        return Model.getQueryBuilder(this).find(id);
+        return Model.getRelationBuilder(this).find(id);
     }
     static async create(data) {
         if (!data)
             throw new Error('Data is required for create operation');
-        return Model.getQueryBuilder(this).create(data);
+        return Model.getRelationBuilder(this).create(data);
     }
     static async update(id, data) {
         if (!id)
             throw new Error('ID is required for update operation');
         if (!data)
             throw new Error('Data is required for update operation');
-        return Model.getQueryBuilder(this).update(id, data);
+        return Model.getRelationBuilder(this).update(id, data);
     }
     static async delete(id) {
         if (!id)
             throw new Error('ID is required for delete operation');
-        return Model.getQueryBuilder(this).delete(id);
+        return Model.getRelationBuilder(this).delete(id);
     }
     static async firstOrCreate(where, createData) {
         if (!where)
             throw new Error('Where conditions are required for firstOrCreate operation');
-        return Model.getQueryBuilder(this).firstOrCreate(where, createData);
+        return Model.getRelationBuilder(this).firstOrCreate(where, createData);
     }
     static async updateOrCreate(where, updateData) {
         if (!where)
             throw new Error('Where conditions are required for updateOrCreate operation');
         if (!updateData)
             throw new Error('Update data is required for updateOrCreate operation');
-        return Model.getQueryBuilder(this).updateOrCreate(where, updateData);
+        return Model.getRelationBuilder(this).updateOrCreate(where, updateData);
     }
     async save() {
         try {

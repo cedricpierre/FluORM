@@ -10,5 +10,5 @@ export declare const Relations: {
 };
 export type RelationType = keyof typeof Relations;
 export declare class RelationBuilder {
-    static build<T extends Model<any>>(modelFactory: () => new (...args: any[]) => T, parent?: Model<any>, key?: string | symbol, relationType?: RelationType, urlQueryBuilder?: URLQueryBuilder, resource?: string): Relation<T>;
+    static build<T extends Model<any>>(modelFactory: () => new (...args: any[]) => T, parent?: Model<any>, relationType?: RelationType, urlQueryBuilder?: URLQueryBuilder, resource?: string): Relation<T>;
 }
