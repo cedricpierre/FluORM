@@ -19,7 +19,7 @@ export abstract class Model<A extends Attributes> {
     return this
   }
 
-  private static getQueryBuilder<T extends Model<any>>(modelClass: new (...args: any[]) => T): Relation<T> {
+  private static getRelationBuilder<T extends Model<any>>(modelClass: new (...args: any[]) => T): Relation<T> {
     const cacheKey = modelClass.name
     if (!Model._queryCache.has(cacheKey)) {
       Model._queryCache.set(cacheKey, RelationBuilder.build(() => modelClass))
@@ -27,45 +27,49 @@ export abstract class Model<A extends Attributes> {
     return Model._queryCache.get(cacheKey)
   }
 
+  static id<T extends Model<any>>(this: new (...args: any[]) => T, id: string | number): Relation<T> {
+    return Model.getRelationBuilder(this).id(id)
+  }
+
   static query<T extends Model<any>>(this: new (...args: any[]) => T): Relation<T> {
-    return Model.getQueryBuilder(this)
+    return Model.getRelationBuilder(this)
   }
 
   static where<T extends Model<any>>(this: new (...args: any[]) => T, where: Partial<T>): Relation<T> {
-    return Model.getQueryBuilder(this).where(where)
+    return Model.getRelationBuilder(this).where(where)
   }
 
   static filter<T extends Model<any>>(this: new (...args: any[]) => T, filters: Record<string, any>): Relation<T> {
-    return Model.getQueryBuilder(this).filter(filters)
+    return Model.getRelationBuilder(this).filter(filters)
   }
 
   static include<T extends Model<any>>(this: new (...args: any[]) => T, relations: string | string[]): Relation<T> {
-    return Model.getQueryBuilder(this).include(relations)
+    return Model.getRelationBuilder(this).include(relations)
   }
 
   static async all<T extends Model<any>>(this: new (...args: any[]) => T): Promise<T[]> {
-    return Model.getQueryBuilder(this).all()
+    return Model.getRelationBuilder(this).all()
   }
 
   static async find<T extends Model<any>>(this: new (...args: any[]) => T, id: string | number): Promise<T> {
     if (!id) throw new Error('ID is required for find operation')
-    return Model.getQueryBuilder(this).find(id)
+    return Model.getRelationBuilder(this).find(id)
   }
 
   static async create<T extends Model<any>>(this: new (...args: any[]) => T, data: Partial<T>): Promise<T> {
     if (!data) throw new Error('Data is required for create operation')
-    return Model.getQueryBuilder(this).create(data)
+    return Model.getRelationBuilder(this).create(data)
   }
 
   static async update<T extends Model<any>>(this: new (...args: any[]) => T, id: string | number, data: Partial<T>): Promise<T> {
     if (!id) throw new Error('ID is required for update operation')
     if (!data) throw new Error('Data is required for update operation')
-    return Model.getQueryBuilder(this).update(id, data)
+    return Model.getRelationBuilder(this).update(id, data)
   }
 
   static async delete(this: new (...args: any[]) => Model<any>, id: string | number): Promise<void> {
     if (!id) throw new Error('ID is required for delete operation')
-    return Model.getQueryBuilder(this).delete(id)
+    return Model.getRelationBuilder(this).delete(id)
   }
 
   static async firstOrCreate<T extends Model<any>>(
@@ -74,7 +78,7 @@ export abstract class Model<A extends Attributes> {
     createData?: Partial<T>
   ): Promise<T> {
     if (!where) throw new Error('Where conditions are required for firstOrCreate operation')
-    return Model.getQueryBuilder(this).firstOrCreate(where, createData)
+    return Model.getRelationBuilder(this).firstOrCreate(where, createData)
   }
 
   static async updateOrCreate<T extends Model<any>>(
@@ -84,7 +88,7 @@ export abstract class Model<A extends Attributes> {
   ): Promise<T> {
     if (!where) throw new Error('Where conditions are required for updateOrCreate operation')
     if (!updateData) throw new Error('Update data is required for updateOrCreate operation')
-    return Model.getQueryBuilder(this).updateOrCreate(where, updateData)
+    return Model.getRelationBuilder(this).updateOrCreate(where, updateData)
   }
 
   async save(): Promise<this> {

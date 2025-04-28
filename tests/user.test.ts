@@ -145,7 +145,9 @@ describe('User Model', () => {
       { id: '1', size: 'sm', url: 'https://example.com/photo1.jpg' }
     ])
 
-    const thumbnail = await media.thumbnails.first()
+    const allThumbnails = await media.thumbnails.all()
+
+    const thumbnail = allThumbnails[0]
 
     expect(thumbnail).toBeInstanceOf(Thumbnail)
     expect(thumbnail.id).toBe('1')
@@ -246,5 +248,17 @@ describe('User Model', () => {
     expect(thumbnails).toBeInstanceOf(Array)
     expect(thumbnails).toHaveLength(2)
     expect(thumbnails.every((thumbnail: Thumbnail) => thumbnail instanceof Thumbnail)).toBe(true)
+  })
+
+
+  it('generates deep nested relations', async () => {
+
+    vi.spyOn(FluORM, 'call').mockImplementation((url) => {
+      expect(url).toBe(`${baseUrl}/users/1/medias/2/thumbnails?include=size`)
+      expect(url.includes('include=size')).toBeTruthy()
+      return Promise.resolve([])
+    })
+
+    await User.id(1).medias.id(2).thumbnails.include('size').all();
   })
 })

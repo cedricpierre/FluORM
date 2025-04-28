@@ -120,6 +120,8 @@ class User extends Model<IUser> {
 
 Models come with several static methods for querying and manipulating data:
 
+### Fetch methods
+
 - `all()`: Get all records
 - `find(id)`: Find a record by ID
 - `create(data)`: Create a new record
@@ -127,10 +129,13 @@ Models come with several static methods for querying and manipulating data:
 - `delete(id)`: Delete a record
 - `firstOrCreate(where, createData)`: Find first record or create if not found
 - `updateOrCreate(where, updateData)`: Update first record or create if not found
+
 - `query()`: Start a new query builder
 - `where(conditions)`: Add where conditions
 - `filter(filters)`: Add filter conditions
 - `include(relations)`: Include related models
+- `id(id)`: Return a new instance with id.
+
 
 Example usage:
 
@@ -158,6 +163,10 @@ const activeUsers = await User.where({ status: 'active' }).all();
 
 // Include related models
 const userWithPosts = await User.include('posts').find(1);
+
+// Deep chaining
+const thumbails = User.id(1).medias.id(2).thumnails.all();
+// Will make a call to /users/1/medias/2/thumbails
 ```
 
 ## Instance Methods

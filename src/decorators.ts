@@ -14,10 +14,9 @@ const makeRelation = (
                 return RelationBuilder.build<any>(
                     modelFactory,
                     this,
-                    key,
                     type,
                     undefined,
-                    resource
+                    resource ?? String(key)
                 );
             },
             enumerable: true,

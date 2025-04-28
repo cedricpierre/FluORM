@@ -18,7 +18,6 @@ export class RelationBuilder {
     static build<T extends Model<any>>(
         modelFactory: () => new (...args: any[]) => T,
         parent?: Model<any>,
-        key?: string | symbol,
         relationType?: RelationType,
         urlQueryBuilder?: URLQueryBuilder,
         resource?: string
@@ -27,22 +26,29 @@ export class RelationBuilder {
         const query = urlQueryBuilder ?? new URLQueryBuilder()
         const RelatedModel = modelFactory()
 
-        let basePath = resource ?? (parent?.constructor as any)?.resource ?? (RelatedModel as any).resource
-        if(parent?.id) {
-            basePath += `/${parent.id}`
+        let basePath = resource ?? (parent as any)?.resource ?? (RelatedModel as any).resource
+        if(parent) {
+            basePath = `${parent.resource}/${basePath}`
         }
 
-        if(key) {
-            basePath += `/${String(key)}`
-        }
+        console.log('basePath', basePath, parent)
 
         const queryBuilder: any = {
-            where: (where: Record<string, any>) => { query.where(where); return this.build(modelFactory, parent, key, relationType, query, resource) },
-            filter: (filters: Record<string, any>) => { query.filter(filters); return this.build(modelFactory, parent, key, relationType, query, resource) },
-            include: (relations: string | string[]) => { query.include(relations); return this.build(modelFactory, parent, key, relationType, query, resource) },
-            orderBy: (field: string, dir: string = 'asc') => { query.orderBy(field, dir); return this.build(modelFactory, parent, key, relationType, query, resource) },
-            limit: (n: number) => { query.limit(n); return this.build(modelFactory, parent, key, relationType, query, resource) },
-            offset: (n: number) => { query.offset(n); return this.build(modelFactory, parent, key, relationType, query, resource) },
+            id: (id: string | number) => { 
+                const item = new RelatedModel({id}) as any
+                item.resource = `${basePath}/${id}`
+                return item
+            },
+            find: async (id: string) => {
+                const item = await HttpClient.call(`${basePath}/${id}`)
+                return new RelatedModel(item)
+            },            
+            where: (where: Record<string, any>) => { query.where(where); return this.build(modelFactory, parent, relationType, query, resource) },
+            filter: (filters: Record<string, any>) => { query.filter(filters); return this.build(modelFactory, parent, relationType, query, resource) },
+            include: (relations: string | string[]) => { query.include(relations); return this.build(modelFactory, parent, relationType, query, resource) },
+            orderBy: (field: string, dir: string = 'asc') => { query.orderBy(field, dir); return this.build(modelFactory, parent, relationType, query, resource) },
+            limit: (n: number) => { query.limit(n); return this.build(modelFactory, parent, relationType, query, resource) },
+            offset: (n: number) => { query.offset(n); return this.build(modelFactory, parent, relationType, query, resource) },
         }
 
         // 💡 Injection des scopes dynamiques
@@ -50,7 +56,7 @@ export class RelationBuilder {
             if (typeof fn === 'function') {
                 queryBuilder[name] = (...args: any[]) => {
                     query.filter(fn(...args))
-                    return this.build(modelFactory, parent, key, relationType, query, resource)
+                    return this.build(modelFactory, parent, relationType, query, resource)
                 }
             }
         }
@@ -114,15 +120,6 @@ export class RelationBuilder {
             all: async () => {
                 const list = await HttpClient.call(buildUrl())
                 return list.map((i: any) => new RelatedModel(i))
-            },
-            first: async () => {
-                query.limit(1)
-                const list = await HttpClient.call(buildUrl())
-                return list[0] ? new RelatedModel(list[0]) : undefined
-            },
-            find: async (id: string) => {
-                const item = await HttpClient.call(`${basePath}/${id}`)
-                return new RelatedModel(item)
             },
             create: async (payload: any) => {
                 const data = await HttpClient.call(basePath, {
