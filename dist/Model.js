@@ -132,4 +132,23 @@ export class Model {
             throw new Error('Failed to delete model: Unknown error');
         }
     }
+    toObject() {
+        const obj = {};
+        Object.keys(this).forEach(key => {
+            obj[key] = this[key];
+        });
+        const descriptors = Object.getOwnPropertyDescriptors(Object.getPrototypeOf(this));
+        for (const [key, descriptor] of Object.entries(descriptors)) {
+            if (descriptor.get) {
+                const value = this[key];
+                if (value instanceof Model) {
+                    obj[key] = value.toObject();
+                }
+                else if (Array.isArray(value) && value.length > 0) {
+                    obj[key] = value.filter((item) => item instanceof Model).map((item) => item.toObject());
+                }
+            }
+        }
+        return obj;
+    }
 }

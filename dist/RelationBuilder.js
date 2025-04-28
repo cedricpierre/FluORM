@@ -14,7 +14,6 @@ export class RelationBuilder {
         if (parent) {
             basePath = `${parent.resource}/${basePath}`;
         }
-        console.log('basePath', basePath, parent);
         const queryBuilder = {
             id: (id) => {
                 const item = new RelatedModel({ id });

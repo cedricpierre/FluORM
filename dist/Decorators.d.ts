@@ -1,8 +1,6 @@
-import type { Model } from './Model';
-type CastInput = ((val?: any) => any) | (() => any) | (() => [any]);
-export declare const Cast: (caster: CastInput) => (target: any, propertyKey: string) => void;
+import { Model } from './Model';
+export declare const Cast: (caster: () => new (...args: any[]) => any) => (target: any, key: string) => void;
 export declare const HasOne: (model: () => Model<any>, resource?: string) => (target: any, key: string | symbol) => void;
 export declare const HasMany: (model: () => Model<any>, resource?: string) => (target: any, key: string | symbol) => void;
 export declare const BelongsTo: (model: () => Model<any>, resource?: string) => (target: any, key: string | symbol) => void;
 export declare const BelongsToMany: (model: () => Model<any>, resource?: string) => (target: any, key: string | symbol) => void;
-export {};

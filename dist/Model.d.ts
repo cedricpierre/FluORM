@@ -24,4 +24,5 @@ export declare abstract class Model<A extends Attributes> {
     save(): Promise<this>;
     update(data?: Partial<this>): Promise<this>;
     delete(): Promise<void>;
+    toObject(): Record<string, any>;
 }

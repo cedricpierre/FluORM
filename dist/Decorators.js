@@ -12,34 +12,46 @@ const makeRelation = (modelFactory, type, resource) => {
     };
 };
 export const Cast = (caster) => {
-    return function (target, propertyKey) {
-        const privateKey = Symbol(propertyKey);
-        let transformer;
-        // If it's an object factory
-        if (typeof caster === 'function') {
-            const sample = caster();
-            if (Array.isArray(sample)) {
-                const ItemType = sample[0];
-                transformer = (val) => Array.isArray(val)
-                    ? val.map((v) => v instanceof ItemType ? v : Object.assign(new ItemType(), v))
-                    : [];
-            }
-            else if (typeof sample === 'object') {
-                transformer = (val) => val instanceof sample.constructor ? val : Object.assign(new sample.constructor(), val);
-            }
-            else {
-                transformer = caster;
-            }
-        }
-        else {
-            transformer = caster;
-        }
-        Object.defineProperty(target, propertyKey, {
+    return function (target, key) {
+        // Create a unique symbol for each instance
+        const privateKey = Symbol(key);
+        // Initialize the property on the prototype
+        Object.defineProperty(target, key, {
             get() {
-                return this[privateKey];
+                if (!this[privateKey]) {
+                    this[privateKey] = undefined;
+                }
+                const value = this[privateKey];
+                if (!value)
+                    return value;
+                const ModelClass = caster();
+                if (!ModelClass)
+                    return value;
+                if (Array.isArray(value)) {
+                    return value.map(item => item instanceof ModelClass ? item : new ModelClass(item));
+                }
+                else if (value instanceof ModelClass) {
+                    return value;
+                }
+                else {
+                    return new ModelClass(value);
+                }
             },
             set(value) {
-                this[privateKey] = transformer(value);
+                const ModelClass = caster();
+                if (!ModelClass) {
+                    this[privateKey] = value;
+                    return;
+                }
+                if (Array.isArray(value)) {
+                    this[privateKey] = value.map(item => item instanceof ModelClass ? item : new ModelClass(item));
+                }
+                else if (value instanceof ModelClass) {
+                    this[privateKey] = value;
+                }
+                else {
+                    this[privateKey] = new ModelClass(value);
+                }
             },
             enumerable: true,
             configurable: true,
