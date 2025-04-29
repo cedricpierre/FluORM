@@ -1,11 +1,13 @@
-import { RelationBuilder, Relations, type RelationType } from './RelationBuilder'
+import { RelationBuilder } from './RelationBuilder'
 import { Model } from './Model'
 import { HasManyRelationBuilder } from './HasManyRelationBuilder';
 import { HasOneRelationBuilder } from './HasOneRelationBuilder';
 
+export type Constructor<T = any> = new (...args: any[]) => T;
+
 const makeRelation = (
     modelFactory: () => Model<any>,
-    relationBuilderFactory: new (...args: any[]) => RelationBuilder<any>,
+    relationBuilderFactory: Constructor<RelationBuilder<any>>,
     resource?: string
 ) => {
     
@@ -15,7 +17,6 @@ const makeRelation = (
             get(this: Model<any>) {
                 return new relationBuilderFactory(
                     modelFactory,
-                    this,
                     undefined,
                     resource ?? String(key)
                 );

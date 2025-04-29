@@ -1,5 +1,5 @@
 import { Model } from "./Model"
-import { HttpClient, Methods } from "./HttpClient"
+import { HttpClient } from "./HttpClient"
 import { URLQueryBuilder } from "./URLQueryBuilder"
 
 export type Relation<T> = any
@@ -7,26 +7,21 @@ export type RelationFor<T> = T extends Array<any> ? Relation<T> : Relation<T[]>
 
 export class RelationBuilder<T extends Model<any>> {
     protected queryBuilder: URLQueryBuilder
-    protected relatedModel: Model<any>
-    protected path: string
+    protected relatedModel: T
+    protected path: string = ''
+    protected currentId?: string | number
 
     constructor(
-        modelFactory: () => Model<any>,
-        parent?: Model<any>,
+        model: () => Model<any>,
         urlQueryBuilder?: URLQueryBuilder,
-        resource?: string
+        initialPath?: string
     ) {
         this.queryBuilder = urlQueryBuilder ?? new URLQueryBuilder()
-        this.relatedModel = modelFactory()
-        
-        this.path = resource ?? (parent as any)?.resource ?? (this.relatedModel as any).resource
-        
-        if(parent) {
-            this.path = `${parent.resource}/${this.path}`
-        }
+        this.relatedModel = model() as T
+        this.path = initialPath ?? (this.relatedModel as any).resource
 
-        if ((this.relatedModel as Model<any>).scopes) {
-            Object.entries((this.relatedModel as Model<any>).scopes).forEach(([name, scope]) => {
+        if (this.relatedModel.scopes) {
+            Object.entries(this.relatedModel.scopes).forEach(([name, scope]) => {
                 (this as any)[name] = () => {
                     return this.where(scope as Record<string, any>)
                 }
@@ -35,49 +30,50 @@ export class RelationBuilder<T extends Model<any>> {
     }
 
     id(id: string | number) { 
-        const item = new (this.relatedModel as any)({id})
-        item.resource = `${this.path}/${id}`
-        return item
+        this.currentId = id
+        return this
     }
 
-    async find(id: string) {
-        const item = await HttpClient.call(`${this.path}/${id}`)
-        return new (this.relatedModel as any)(item)
+    async find(id: string | number): Promise<Model<T>> {
+        const url = `${this.path}/${id}${this.queryBuilder.toQueryString() ? `?${this.queryBuilder.toQueryString()}` : ''}`
+        const response = await HttpClient.call(url)
+        return new (this.relatedModel as any)(response.data)
     }
 
-    where(where: Record<string, any>) { 
+    where(where: Record<string, any>): RelationBuilder<T> { 
         this.queryBuilder.where(where)
         return this
     }
 
-    filter(filters: Record<string, any>) { 
+    filter(filters: Record<string, any>): RelationBuilder<T> { 
         this.queryBuilder.filter(filters)
         return this
     }
 
-    include(relations: string | string[]) { 
+    include(relations: string | string[]): RelationBuilder<T> { 
         this.queryBuilder.include(relations)
         return this
     }
 
-    orderBy(field: string, dir: string = 'asc') { 
+    orderBy(field: string, dir: string = 'asc'): RelationBuilder<T> { 
         this.queryBuilder.orderBy(field, dir)
         return this
     }
 
-    limit(n: number) { 
+    limit(n: number): RelationBuilder<T> { 
         this.queryBuilder.limit(n)
         return this
     }
 
-    offset(n: number) { 
+    offset(n: number): RelationBuilder<T> { 
         this.queryBuilder.offset(n)
         return this
     }
 
     protected buildUrl() {
-        const queryObject = this.queryBuilder.toObject()
-        const url = Object.keys(queryObject).length > 0 ? `${this.path}?${new URLSearchParams(queryObject).toString()}` : this.path
+        const basePath = this.currentId ? `${this.path}/${this.currentId}` : this.path
+        const queryString = this.queryBuilder.toQueryString()
+        const url = queryString ? `${basePath}?${queryString}` : basePath
         this.queryBuilder.reset()
         return decodeURIComponent(`${HttpClient.options.baseUrl}/${url}`)
     }

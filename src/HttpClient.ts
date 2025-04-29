@@ -15,7 +15,7 @@ export class HttpClient {
   static async call<T = any>(
     url: string,
     options?: RequestOptions
-  ): Promise<T> {
+  ): Promise<Response<T>> {
 
     if (!this.options.baseUrl) {
       throw new Error('baseUrl is required')
@@ -37,7 +37,7 @@ export class HttpClient {
     } else {
       const resp = await fetch(request.url, request.options as RequestInit);
       if (resp.ok) {
-        response = await resp.json();
+        response = await resp.json() as Response<T>;
       }
     }
 
@@ -47,7 +47,7 @@ export class HttpClient {
       response = this.options.responseInterceptor.call(this, response)
     }
     
-    return response.data
+    return response
   }
 }
 

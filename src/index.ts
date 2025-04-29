@@ -1,4 +1,4 @@
 export * from './Model'
-export * from './Decorators'
+export * from './decorators'
 export * from './HttpClient'
 export { HttpClient as FluORM } from './HttpClient'

@@ -69,4 +69,10 @@ export class URLQueryBuilder {
 
         return obj
     }
+
+    toQueryString(): string {
+        return Object.entries(this.toObject())
+            .map(([key, value]) => `${key}=${value}`)
+            .join('&')
+    }
 }
