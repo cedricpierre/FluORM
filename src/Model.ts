@@ -11,7 +11,7 @@ export class Model<A extends Attributes> {
   static scopes?: Record<string, (query: RelationBuilder<any>) => RelationBuilder<any>>
 
   id?: string | number
-  [key: string]: any
+  [key: string]: any  
 
   static resource: string
   private static _queryCache = new WeakMap<Constructor<Model<any>>, any>()

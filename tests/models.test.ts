@@ -296,7 +296,6 @@ describe('Models', () => {
       return Promise.resolve({ data: [], error: undefined })
     })
 
-    console.log(User.id(1).medias)
     await User.id(1).medias.id(2).thumbnails.include('size').all();
   })
 })
