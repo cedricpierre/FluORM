@@ -2,7 +2,7 @@ import { RelationBuilder, Relations, type RelationType } from './RelationBuilder
 import { Model } from './Model'
 
 const makeRelation = (
-    modelFactory: () => new (...args: any[]) => Model<any>,
+    modelFactory: () => Model<any>,
     type: RelationType,
     resource?: string
 ) => {
@@ -26,7 +26,7 @@ const makeRelation = (
 }
 
 export const Cast = (caster: () => new (...args: any[]) => any) => {
-    return function (target: any, key: string) {
+    return (target: any, key: string) => {
         // Create a unique symbol for each instance
         const privateKey = Symbol(key);
 
@@ -72,15 +72,15 @@ export const Cast = (caster: () => new (...args: any[]) => any) => {
 };
 
 // Aliases
-export const HasOne = (model: () => any, resource?: string) => {
-    return function (target: any, propertyKey: string | symbol) {
-        return makeRelation(model, Relations.hasOne, resource)(target, propertyKey);
+export const HasOne = (model: () => new (...args: any[]) => Model<any>, resource?: string) => {
+    return (target: any, propertyKey: string | symbol) => {
+        return makeRelation(model as any, Relations.hasOne, resource)(target, propertyKey);
     }
 }
 
 export const HasMany = (model: () => new (...args: any[]) => Model<any>, resource?: string) => {
-    return function (target: any, propertyKey: string | symbol) {
-        return makeRelation(model, Relations.hasMany, resource)(target, propertyKey);
+    return (target: any, propertyKey: string | symbol) => {
+        return makeRelation(model as any, Relations.hasMany, resource)(target, propertyKey);
     }
 }
 

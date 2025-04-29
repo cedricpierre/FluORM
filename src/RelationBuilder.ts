@@ -16,7 +16,7 @@ export type RelationType = keyof typeof Relations;
 
 export class RelationBuilder {
     static build<T extends Model<any>>(
-        modelFactory: () => new (...args: any[]) => T,
+        modelFactory: () => Model<any>,
         parent?: Model<any>,
         relationType?: RelationType,
         urlQueryBuilder?: URLQueryBuilder,
