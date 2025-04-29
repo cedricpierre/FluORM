@@ -11,6 +11,7 @@ export class Model<A extends Attributes> {
   static scopes?: Record<string, (query: RelationBuilder<any>) => RelationBuilder<any>>
 
   id?: string | number
+  _path?: string
   [key: string]: any  
 
   static resource: string

@@ -29,7 +29,9 @@ export class RelationBuilder<T extends Model<any>> {
     }
 
     id(id: string | number): Model<T> { 
-        return new (this.relatedModel as any)({ id })
+        const model = new (this.relatedModel as any)({ id })
+        model._path = `${this.path}/${id}`
+        return model
     }
 
     async find(id: string | number): Promise<Model<T>> {

@@ -27,7 +27,7 @@ const makeRelation = (
     }
 }
 
-export const Cast = (caster: () => new (...args: any[]) => any) => {
+export const Cast = (caster: () => Constructor<any>) => {
     return (target: any, key: string) => {
         // Create a unique symbol for each instance
         const privateKey = Symbol(key);
@@ -74,13 +74,13 @@ export const Cast = (caster: () => new (...args: any[]) => any) => {
 };
 
 // Aliases
-export const HasOne = (model: () => new (...args: any[]) => Model<any>, resource?: string) => {
+export const HasOne = (model: () => Constructor<Model<any>>, resource?: string) => {
     return (target: any, propertyKey: string | symbol) => {
         return makeRelation(model as any, HasOneRelationBuilder as any, resource)(target, propertyKey);
     }
 }
 
-export const HasMany = (model: () => new (...args: any[]) => Model<any>, resource?: string) => {
+export const HasMany = (model: () => Constructor<Model<any>>, resource?: string) => {
     return (target: any, propertyKey: string | symbol) => {
         return makeRelation(model as any, HasManyRelationBuilder as any, resource)(target, propertyKey);
     }
