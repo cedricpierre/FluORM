@@ -9,7 +9,6 @@ export class RelationBuilder<T extends Model<any>> {
     protected queryBuilder: URLQueryBuilder
     protected relatedModel: T
     protected path: string = ''
-    protected currentId?: string | number
 
     constructor(
         model: () => Model<any>,
@@ -30,7 +29,6 @@ export class RelationBuilder<T extends Model<any>> {
     }
 
     id(id: string | number): Model<T> { 
-        this.currentId = id
         return new (this.relatedModel as any)({ id })
     }
 
@@ -71,10 +69,8 @@ export class RelationBuilder<T extends Model<any>> {
     }
 
     protected buildUrl() {
-
-        const basePath = this.currentId ? `${this.path}/${this.currentId}` : this.path
         const queryString = this.queryBuilder.toQueryString()
-        const url = queryString ? `${basePath}?${queryString}` : basePath
+        const url = queryString ? `${this.path}?${queryString}` : this.path
         this.queryBuilder.reset()
         return decodeURIComponent(`${HttpClient.options.baseUrl}/${url}`)
     }
