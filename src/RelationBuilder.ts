@@ -70,6 +70,28 @@ export class RelationBuilder<T extends Model<any>> {
         return this
     }
 
+    async update(id: string | number, data: Record<string, any>): Promise<Model<T>> {
+        const response = await HttpClient.call(`${this.path}/${id}`, {
+            method: 'PUT',
+            body: data
+        })
+        return new (this.relatedModel as any)(response.data)
+    }
+
+    async create(data: Record<string, any>): Promise<Model<T>> {
+        const response = await HttpClient.call(this.path, {
+            method: 'POST',
+            body: data
+        })
+        return new (this.relatedModel as any)(response.data)
+    }
+
+    async delete(id: string | number): Promise<void> {
+        await HttpClient.call(`${this.path}/${id}`, {
+            method: 'DELETE'
+        })
+    }
+
     protected buildUrl() {
         const queryString = this.queryBuilder.toQueryString()
         const url = queryString ? `${this.path}?${queryString}` : this.path

@@ -137,6 +137,52 @@ describe('Models', () => {
     expect(user.name).toBe('Cedric')
   })
 
+  it('can update an instance of a user', async () => {
+    vi.spyOn(FluORM, 'call').mockResolvedValue({ data: 1, error: undefined })
+
+    await user.update({ name: 'Cedric updated' })
+
+    expect(user.name).toBe('Cedric updated')
+  })
+
+  it('can save an instance of a user', async () => {
+    vi.spyOn(FluORM, 'call').mockResolvedValue({ data: { id: '123', name: 'Cedric updated' }, error: undefined })
+
+    await user.save()
+
+    expect(user.name).toBe('Cedric updated')
+  })
+
+  it('can delete an instance of a user', async () => {
+    vi.spyOn(FluORM, 'call').mockResolvedValue({ data: undefined, error: undefined })
+
+    await user.delete()
+  })
+
+  it('can update a user by ID', async () => {
+    vi.spyOn(FluORM, 'call').mockResolvedValue({ data: { name: 'Cedric updated' }, error: undefined })
+
+    const updatedUser = await User.update('123', { name: 'Cedric updated' })
+
+    expect(updatedUser).toBeInstanceOf(User)
+    expect(updatedUser.name).toBe('Cedric updated')
+  })
+
+  it('can create a user by ID', async () => {
+    vi.spyOn(FluORM, 'call').mockResolvedValue({ data: { id: '123', name: 'Cedric new' }, error: undefined })
+
+    const createdUser = await User.create({ name: 'Cedric new' })
+
+    expect(createdUser).toBeInstanceOf(User)
+    expect(createdUser.name).toBe('Cedric new')
+  })
+
+  it('can delete a user by ID', async () => {
+    vi.spyOn(FluORM, 'call').mockResolvedValue({ data: undefined, error: undefined })
+
+    await User.delete('123')
+  })
+
   it('can fetch all medias from user', async () => {
     vi.spyOn(FluORM, 'call').mockResolvedValue({ data: [
       { id: '1', name: 'Photo 1', url: 'https://example.com/photo1.jpg' },
