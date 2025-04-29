@@ -8,13 +8,14 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "outDir": "./dist",
-    "rootDir": "./src",
+    "rootDir": ".",
     "declaration": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
+    "useDefineForClassFields": false,
     "allowJs": true,
     "resolveJsonModule": true
   },
-  "include": ["./src/**/*.ts"],
+  "include": ["./src/**/*.ts", "./examples/**/*.ts"],
   "exclude": ["node_modules", "dist"]
 } 

@@ -15,13 +15,13 @@ export class User extends Model<IUser> {
     static resource = 'users'
 
     @HasMany(() => Media)
-    declare medias!: Relation<Media[]>;
+    medias!: Relation<Media[]>;
 
     @Cast(() => Thumbnail)
-    declare thumbnail!: Thumbnail
+    thumbnail!: Thumbnail
 
     @Cast(() => Thumbnail)
-    declare thumbnails!: Thumbnail[]
+    thumbnails!: Thumbnail[]
 
 
     static scopes = {

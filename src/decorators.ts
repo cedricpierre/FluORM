@@ -72,12 +72,16 @@ export const Cast = (caster: () => new (...args: any[]) => any) => {
 };
 
 // Aliases
-export const HasOne = (model: () => Model<any>, resource?: string) => {
-    return makeRelation(model as any, Relations.hasOne, resource)
+export const HasOne = (model: () => any, resource?: string) => {
+    return function (target: any, propertyKey: string | symbol) {
+        return makeRelation(model, Relations.hasOne, resource)(target, propertyKey);
+    }
 }
 
-export const HasMany = (model: () => Model<any>, resource?: string) => {
-    return makeRelation(model as any, Relations.hasMany, resource)
+export const HasMany = (model: () => new (...args: any[]) => Model<any>, resource?: string) => {
+    return function (target: any, propertyKey: string | symbol) {
+        return makeRelation(model, Relations.hasMany, resource)(target, propertyKey);
+    }
 }
 
 export const BelongsTo = HasOne

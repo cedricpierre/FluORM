@@ -16,8 +16,8 @@ export class Media extends Model<IMedia> {
     static resource = 'medias'
 
     @BelongsTo(() => User)
-    declare user: Relation<User>
+    user!: Relation<User>
 
     @HasMany(() => Thumbnail)
-    declare thumbnails: Relation<Thumbnail[]>
+    thumbnails!: Relation<Thumbnail[]>
 }

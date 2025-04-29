@@ -1,6 +1,4 @@
-import { Media } from './Media'
-import { Model, BelongsTo } from '../../src/index'
-import { Relation } from '../../src/RelationBuilder'
+import { Model } from '../../src/index'
 
 export class Thumbnail extends Model<any> {
     static resource = 'thumbnails'
