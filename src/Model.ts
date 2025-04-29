@@ -4,7 +4,7 @@ export interface Attributes extends Record<string, any> {
   id?: string | number
 }
 
-export abstract class Model<A extends Attributes> {
+export class Model<A extends Attributes> {
   id?: string | number
   [key: string]: any
 

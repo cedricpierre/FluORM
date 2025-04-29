@@ -24,7 +24,7 @@ export class RelationBuilder {
     ): Relation<T> {
 
         const query = urlQueryBuilder ?? new URLQueryBuilder()
-        const RelatedModel = modelFactory()
+        const RelatedModel = modelFactory() as Model<any> | any
 
         let basePath = resource ?? (parent as any)?.resource ?? (RelatedModel as any).resource
         
@@ -34,7 +34,7 @@ export class RelationBuilder {
 
         const queryBuilder: any = {
             id: (id: string | number) => { 
-                const item = new RelatedModel({id}) as any
+                const item = new RelatedModel({id})
                 item.resource = `${basePath}/${id}`
                 return item
             },

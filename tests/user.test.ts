@@ -74,9 +74,7 @@ describe('User Model', () => {
     })
 
     const obj = user.toObject()
-
-    console.log(obj)
-
+    
     expect(obj).toEqual({
       id: '123',
       name: 'Cedric',
