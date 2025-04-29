@@ -1,9 +1,11 @@
 import { RelationBuilder, Relations, type RelationType } from './RelationBuilder'
 import { Model } from './Model'
+import { HasManyRelationBuilder } from './HasManyRelationBuilder';
+import { HasOneRelationBuilder } from './HasOneRelationBuilder';
 
 const makeRelation = (
     modelFactory: () => Model<any>,
-    type: RelationType,
+    relationBuilderFactory: new (...args: any[]) => RelationBuilder<any>,
     resource?: string
 ) => {
     
@@ -11,10 +13,9 @@ const makeRelation = (
         // Initialize the property on the prototype
         Object.defineProperty(target, key, {
             get(this: Model<any>) {
-                return RelationBuilder.build<any>(
+                return new relationBuilderFactory(
                     modelFactory,
                     this,
-                    type,
                     undefined,
                     resource ?? String(key)
                 );
@@ -74,13 +75,13 @@ export const Cast = (caster: () => new (...args: any[]) => any) => {
 // Aliases
 export const HasOne = (model: () => new (...args: any[]) => Model<any>, resource?: string) => {
     return (target: any, propertyKey: string | symbol) => {
-        return makeRelation(model as any, Relations.hasOne, resource)(target, propertyKey);
+        return makeRelation(model as any, HasOneRelationBuilder as any, resource)(target, propertyKey);
     }
 }
 
 export const HasMany = (model: () => new (...args: any[]) => Model<any>, resource?: string) => {
     return (target: any, propertyKey: string | symbol) => {
-        return makeRelation(model as any, Relations.hasMany, resource)(target, propertyKey);
+        return makeRelation(model as any, HasManyRelationBuilder as any, resource)(target, propertyKey);
     }
 }
 

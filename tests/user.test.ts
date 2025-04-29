@@ -203,7 +203,7 @@ describe('User Model', () => {
     
   })
 
-  it('can find users where name is Cedric', async () => {
+  it('can find users where name is Cedric and is active', async () => {
     vi.spyOn(FluORM, 'call').mockResolvedValue([
       { id: '1', name: 'Cedric', email: 'cedric@example.com' }
     ])
@@ -214,6 +214,7 @@ describe('User Model', () => {
       .include('medias')
       .active()
       .all()
+
 
     expect(users).toHaveLength(1)
     expect(users[0]).toBeInstanceOf(User)
