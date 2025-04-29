@@ -29,9 +29,9 @@ export class RelationBuilder<T extends Model<any>> {
         }
     }
 
-    id(id: string | number) { 
+    id(id: string | number): Model<T> { 
         this.currentId = id
-        return this
+        return new (this.relatedModel as any)({ id })
     }
 
     async find(id: string | number): Promise<Model<T>> {
