@@ -14,7 +14,7 @@ interface IUser extends Attributes {
 export class User extends Model<IUser> {
     static resource = 'users'
 
-    @HasMany(() => Media as any)
+    @HasMany(() => Media)
     declare medias!: Relation<Media[]>;
 
     @Cast(() => Thumbnail)

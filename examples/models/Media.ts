@@ -15,9 +15,9 @@ export interface IMedia extends Attributes {
 export class Media extends Model<IMedia> {
     static resource = 'medias'
 
-    @BelongsTo(() => User as any)
+    @BelongsTo(() => User)
     declare user: Relation<User>
 
-    @HasMany(() => Thumbnail as any)
+    @HasMany(() => Thumbnail)
     declare thumbnails: Relation<Thumbnail[]>
 }
