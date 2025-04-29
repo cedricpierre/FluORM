@@ -33,7 +33,7 @@ export class Model<A extends Attributes> {
     return Model._queryCache.get(modelClass)
   }
 
-  static id<T extends Model<any>>(this: new (...args: any[]) => T, id: string | number): Relation<T> {
+  static id<T extends Model<any>>(id: string | number): Relation<T> {
     return Model.getRelationBuilder(this, HasOneRelationBuilder).id(id)
   }
 
@@ -41,15 +41,15 @@ export class Model<A extends Attributes> {
     return Model.getRelationBuilder(this, RelationBuilder)
   }
 
-  static where<T extends Model<any>>(this: new (...args: any[]) => T, where: Partial<T>): Relation<T> {
+  static where<T extends Model<any>>(where: Partial<T>): Relation<T> {
     return Model.getRelationBuilder(this, RelationBuilder).where(where)
   }
 
-  static filter<T extends Model<any>>(this: new (...args: any[]) => T, filters: Record<string, any>): Relation<T> {
+  static filter<T extends Model<any>>(filters: Record<string, any>): Relation<T> {
     return Model.getRelationBuilder(this, RelationBuilder).filter(filters)
   }
 
-  static include<T extends Model<any>>(this: new (...args: any[]) => T, relations: string | string[]): Relation<T> {
+  static include<T extends Model<any>>(relations: string | string[]): Relation<T> {
     return Model.getRelationBuilder(this, RelationBuilder).include(relations)
   }
 
@@ -57,17 +57,17 @@ export class Model<A extends Attributes> {
     return Model.getRelationBuilder(this, HasManyRelationBuilder).all()
   }
 
-  static async find<T extends Model<any>>(this: new (...args: any[]) => T, id: string | number): Promise<T> {
+  static async find<T extends Model<any>>(id: string | number): Promise<T> {
     if (!id) throw new Error('ID is required for find operation')
     return Model.getRelationBuilder(this, HasOneRelationBuilder).find(id)
   }
 
-  static async create<T extends Model<any>>(this: new (...args: any[]) => T, data: Partial<T>): Promise<T> {
+  static async create<T extends Model<any>>(data: Partial<T>): Promise<T> {
     if (!data) throw new Error('Data is required for create operation')
     return Model.getRelationBuilder(this, HasOneRelationBuilder).create(data)
   }
 
-  static async update<T extends Model<any>>(this: new (...args: any[]) => T, id: string | number, data: Partial<T>): Promise<T> {
+  static async update<T extends Model<any>>(id: string | number, data: Partial<T>): Promise<T> {
     if (!id) throw new Error('ID is required for update operation')
     if (!data) throw new Error('Data is required for update operation')
     return Model.getRelationBuilder(this, HasOneRelationBuilder).update(id, data)

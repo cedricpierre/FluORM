@@ -71,13 +71,7 @@ export class RelationBuilder<T extends Model<any>> {
     }
 
     protected buildUrl() {
-        console.log(this.relatedModel)
-        if (this.relatedModel._parent) {
-            const parent = this.relatedModel._parent
-            if (parent.id) {
-                this.path = `${(parent.constructor as any).resource}/${parent.id}/${this.resource}`
-            }
-        }
+
         const basePath = this.currentId ? `${this.path}/${this.currentId}` : this.path
         const queryString = this.queryBuilder.toQueryString()
         const url = queryString ? `${basePath}?${queryString}` : basePath
