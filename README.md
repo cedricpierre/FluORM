@@ -196,6 +196,47 @@ await user.update();
 await user.delete();
 ```
 
+## Additional Methods
+
+### toObject()
+
+The `toObject()` method converts a model instance and its related models into a plain JavaScript object:
+
+```typescript
+const user = await User.find(1);
+const userObject = user.toObject();
+// Returns a plain object with all properties and nested related models
+```
+
+## Error Handling
+
+FluORM includes comprehensive error handling for common scenarios:
+
+- Missing required parameters (ID, data, where conditions)
+- Undefined resource names
+- API request failures
+- Invalid model operations
+
+Example error handling:
+
+```typescript
+try {
+  const user = await User.find(1);
+} catch (error) {
+  if (error instanceof Error) {
+    console.error(`Failed to find user: ${error.message}`);
+  }
+}
+
+try {
+  await User.update(1, { name: 'John' });
+} catch (error) {
+  if (error instanceof Error) {
+    console.error(`Failed to update user: ${error.message}`);
+  }
+}
+```
+
 ## License
 
 MIT
