@@ -21,7 +21,7 @@ export abstract class Model<A extends Attributes> {
   private static getRelationBuilder<T extends Model<any>>(modelClass: new (...args: any[]) => T): Relation<T> {
     const cacheKey = modelClass.name
     if (!Model._queryCache.has(cacheKey)) {
-      Model._queryCache.set(cacheKey, RelationBuilder.build(() => modelClass))
+      Model._queryCache.set(cacheKey, RelationBuilder.build(() => modelClass as any))
     }
     return Model._queryCache.get(cacheKey)
   }
