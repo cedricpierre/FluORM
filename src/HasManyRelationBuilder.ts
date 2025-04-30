@@ -16,6 +16,18 @@ export class HasManyRelationBuilder<T extends Model<any>> extends RelationBuilde
         return new (this.relatedModel as any)(data.data)
     }
 
+    async delete(id: string | number) {
+        return await HttpClient.call(`${this.path}/${id}`, { method: Methods.DELETE })
+    }
+
+    async update(id: string | number, data: Record<string, any>): Promise<Model<T>> {
+        const response = await HttpClient.call(`${this.path}/${id}`, {
+            method: Methods.PUT,
+            body: data
+        })
+        return new (this.relatedModel as any)(response.data)
+    }
+
     async paginate(page = 1, perPage = 10) {
         this.queryBuilder.page(page)
             .perPage(perPage)

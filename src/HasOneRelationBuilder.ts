@@ -4,8 +4,7 @@ import { RelationBuilder } from "./RelationBuilder"
 
 export class HasOneRelationBuilder<T extends Model<any>> extends RelationBuilder<T> {
     async update(data: any) {
-        const existing = await HttpClient.call(this.buildUrl())
-        const updated = await HttpClient.call(`${this.path}/${existing.data.id}`, {
+        const updated = await HttpClient.call(`${this.path}/${this.relatedModel.id}`, {
             method: Methods.PATCH,
             body: data
         })
@@ -13,7 +12,6 @@ export class HasOneRelationBuilder<T extends Model<any>> extends RelationBuilder
     }
 
     async delete() {
-        const existing = await HttpClient.call(this.buildUrl())
-        return await HttpClient.call(`${this.path}/${existing.data.id}`, { method: Methods.DELETE })
+        return await HttpClient.call(`${this.path}/${this.relatedModel.id}`, { method: Methods.DELETE })
     }
 }

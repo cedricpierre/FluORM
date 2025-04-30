@@ -127,8 +127,6 @@ Models come with several static methods for querying and manipulating data:
 - `create(data)`: Create a new record
 - `update(id, data)`: Update a record
 - `delete(id)`: Delete a record
-- `firstOrCreate(where, createData)`: Find first record or create if not found
-- `updateOrCreate(where, updateData)`: Update first record or create if not found
 
 - `query()`: Start a new query builder
 - `where(conditions)`: Add where conditions

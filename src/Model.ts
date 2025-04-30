@@ -65,37 +65,18 @@ export class Model<A extends Attributes> {
 
   static async create<T extends Model<any>>(data: Partial<T>): Promise<T> {
     if (!data) throw new Error('Data is required for create operation')
-    return Model.getRelationBuilder(this, HasOneRelationBuilder).create(data)
+    return Model.getRelationBuilder(this, HasManyRelationBuilder).create(data)
   }
 
   static async update<T extends Model<any>>(id: string | number, data: Partial<T>): Promise<T> {
     if (!id) throw new Error('ID is required for update operation')
     if (!data) throw new Error('Data is required for update operation')
-    return Model.getRelationBuilder(this, HasOneRelationBuilder).update(id, data)
+    return Model.getRelationBuilder(this, HasManyRelationBuilder).update(id, data)
   }
 
-  static async delete(this: new (...args: any[]) => Model<any>, id: string | number): Promise<void> {
+  static async delete(id: string | number): Promise<void> {
     if (!id) throw new Error('ID is required for delete operation')
-    return Model.getRelationBuilder(this, HasOneRelationBuilder).delete(id)
-  }
-
-  static async firstOrCreate<T extends Model<any>>(
-    this: new (...args: any[]) => T,
-    where: Partial<T>,
-    createData?: Partial<T>
-  ): Promise<T> {
-    if (!where) throw new Error('Where conditions are required for firstOrCreate operation')
-    return Model.getRelationBuilder(this, HasOneRelationBuilder).firstOrCreate(where, createData)
-  }
-
-  static async updateOrCreate<T extends Model<any>>(
-    this: new (...args: any[]) => T,
-    where: Partial<T>,
-    updateData: Partial<T>
-  ): Promise<T> {
-    if (!where) throw new Error('Where conditions are required for updateOrCreate operation')
-    if (!updateData) throw new Error('Update data is required for updateOrCreate operation')
-    return Model.getRelationBuilder(this, HasOneRelationBuilder).updateOrCreate(where, updateData)
+    return Model.getRelationBuilder(this, HasManyRelationBuilder).delete(id)
   }
 
   async save(): Promise<this> {
