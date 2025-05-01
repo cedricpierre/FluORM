@@ -16,4 +16,19 @@ describe('HttpClient', () => {
 
     expect(response.data).not.toBeNull()
   })
+
+  it('doest have a baseUrl', async () => {
+    HttpClient.configure({ baseUrl: undefined })
+
+    await expect(HttpClient.call('https://jsonplaceholder.typicode.com/posts')).rejects.toThrow('baseUrl is required')
+
+  })
+
+  it('has a baseUrl', async () => {
+    HttpClient.configure({ baseUrl: 'https://jsonplaceholder.typicode.com' })
+
+    const response = await HttpClient.call('posts')
+
+    expect(response.data).not.toBeNull()
+  })
 })

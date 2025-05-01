@@ -13,7 +13,6 @@ export class HasOneRelationBuilder<T extends Model<any>> extends RelationBuilder
             method: Methods.PATCH,
             body: data
         })
-        console.log(updated)
         return new (this.relatedModel as any)(updated.data)
     }
 
