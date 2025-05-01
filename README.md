@@ -85,16 +85,13 @@ import { HasOne, HasMany, BelongsTo, BelongsToMany } from 'fluorm';
 
 class User extends Model<IUser> {
   @HasOne(() => Profile)
-  declare profile: Relation<Profile>;
+  profile!: Relation<Profile>;
 
   @HasMany(() => Post)
-  declare posts: Relation<Post[]>;
-
-  @BelongsTo(() => Team)
-  declare team: Relation<Team>;
+  posts!: Relation<Post[]>;
 
   @BelongsToMany(() => Role)
-  declare roles: Relation<Role[]>;
+  roles!: Relation<Role[]>;
 }
 ```
 
