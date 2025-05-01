@@ -39,6 +39,22 @@ FluORM.configure({
 });
 ```
 
+## Use a custom request handler
+
+By default, FluORM uses the `fetch()` method.
+But you can provide your own request handler like `axios`.
+
+```typescript
+FluORM.configure({
+  baseUrl: 'https://api.example.com',
+  requestHandler: (request) => {
+    // Handle request
+  }
+});
+
+```
+
+
 ## Creating Models
 
 Models are the core of FluORM. Here's how to create a model:
