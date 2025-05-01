@@ -127,7 +127,7 @@ export class Model<A extends Attributes> {
         method: Methods.PATCH,
         body: { ...this }
       })
-      Object.assign(this, updated)
+      Object.assign(this, updated.data)
       return this
     } catch (error: unknown) {
       if (error instanceof Error) {

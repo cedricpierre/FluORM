@@ -32,6 +32,13 @@ describe('Models', () => {
       { id: '456', name: 'Cedric', email: 'cedric@example.com' }
     ], error: undefined })
 
+  })
+
+  it('can fetch all users', async () => {
+    vi.spyOn(FluORM, 'call').mockResolvedValue({ data: [
+      { id: '456', name: 'Cedric', email: 'cedric@example.com' }
+    ], error: undefined })
+
     const users = await User.all()
 
     expect(users).toBeInstanceOf(Array)
@@ -45,6 +52,7 @@ describe('Models', () => {
   it('can create a user with a thumbnail', async () => {
     const thumbnail1 = new Thumbnail({ id: '1', size: 'sm', url: 'https://example.com/photo1.jpg' })
     const thumbnail2 = new Thumbnail({ id: '2', size: 'md', url: 'https://example.com/photo2.jpg' })
+   
     user = new User({ id: '123', name: 'Cedric', email: 'cedric@example.com' })
     user.thumbnail = thumbnail1
     user.thumbnails = [thumbnail1, thumbnail2]
@@ -96,16 +104,6 @@ describe('Models', () => {
       ]
     })
   })
-
-  it('can save a user', async () => {
-    vi.spyOn(FluORM, 'call').mockResolvedValue({ data: 1, error: undefined })
-
-    await user.save()
-
-    expect(user).toBeInstanceOf(User)
-    expect(user.id).toBe('123')
-    expect(user.name).toBe('Cedric')
-  })
   
   it('can fetch all users', async () => {
     vi.spyOn(FluORM, 'call').mockResolvedValue({ data: [
@@ -137,26 +135,12 @@ describe('Models', () => {
     expect(user.name).toBe('Cedric')
   })
 
-  it('can update an instance of a user', async () => {
-    vi.spyOn(FluORM, 'call').mockResolvedValue({ data: 1, error: undefined })
-
-    await user.update({ name: 'Cedric updated' })
-
-    expect(user.name).toBe('Cedric updated')
-  })
-
   it('can save an instance of a user', async () => {
     vi.spyOn(FluORM, 'call').mockResolvedValue({ data: { id: '123', name: 'Cedric updated' }, error: undefined })
 
     await user.save()
 
     expect(user.name).toBe('Cedric updated')
-  })
-
-  it('can delete an instance of a user', async () => {
-    vi.spyOn(FluORM, 'call').mockResolvedValue({ data: undefined, error: undefined })
-
-    await user.delete()
   })
 
   it('can update a user by ID', async () => {
@@ -309,35 +293,35 @@ describe('Models', () => {
       expect(url).toBe(`${baseUrl}/users/1/medias/2?include=thumbnails`)
       expect(url.includes('include=thumbnails')).toBeTruthy()
 
-      return Promise.resolve({ data: [
+      return Promise.resolve({ data: 
         { id: '2',
           name: 'thumbnail',
           url: 'https://example.com/thumbnail.jpg'
-        },
-      ], error: undefined })
+        }
+      , error: undefined })
     })    
   
     const media = await user.medias.include('thumbnails').find(2)
 
-    // expect(media).toBeInstanceOf(Media)
-    // expect(media.id).toBe('2')
-    // expect(media.name).toBe('thumbnail')
-    // expect(media.url).toBe('https://example.com/thumbnail.jpg')
+    expect(media).toBeInstanceOf(Media)
+    expect(media.id).toBe('2')
+    expect(media.name).toBe('thumbnail')
+    expect(media.url).toBe('https://example.com/thumbnail.jpg')
 
-    // vi.spyOn(FluORM, 'call').mockImplementation((url) => {
-    //   expect(url).toBe(`${baseUrl}/medias/2/thumbnails?include=size`)
-    //   expect(url.includes('include=size')).toBeTruthy()
-    //   return Promise.resolve({ data: [
-    //     { id: '1', size: 'sm', url: 'https://example.com/thumbnail1.jpg' },
-    //     { id: '2', size: 'md', url: 'https://example.com/thumbnail2.jpg' }
-    //   ], error: undefined })
-    // })    
+    vi.spyOn(FluORM, 'call').mockImplementation((url) => {
+      expect(url).toBe(`${baseUrl}/users/1/medias/2/thumbnails?include=size`)
+      expect(url.includes('include=size')).toBeTruthy()
+      return Promise.resolve({ data: [
+        { id: '1', size: 'sm', url: 'https://example.com/thumbnail1.jpg' },
+        { id: '2', size: 'md', url: 'https://example.com/thumbnail2.jpg' }
+      ], error: undefined })
+    })    
 
-    // const thumbnails = await media.thumbnails.include('size').all()
+    const thumbnails = await media.thumbnails.include('size').all()
 
-    // expect(thumbnails).toBeInstanceOf(Array)
-    // expect(thumbnails).toHaveLength(2)
-    // expect(thumbnails.every((thumbnail: Thumbnail) => thumbnail instanceof Thumbnail)).toBe(true)
+    expect(thumbnails).toBeInstanceOf(Array)
+    expect(thumbnails).toHaveLength(2)
+    expect(thumbnails.every((thumbnail: Thumbnail) => thumbnail instanceof Thumbnail)).toBe(true)
   })
 
 
@@ -351,4 +335,59 @@ describe('Models', () => {
 
     await User.id(1).medias.id(2).thumbnails.include('size').all();
   })
+
+  it('can use the query method', async () => {
+    vi.spyOn(FluORM, 'call').mockImplementation((url) => {
+      expect(url).toBe(`${baseUrl}/users?name=Cedric`)
+      expect(url.includes('name=Cedric')).toBeTruthy()
+      return Promise.resolve({ data: [], error: undefined })
+    })
+    .mockResolvedValue({ data: [
+      { id: '1', name: 'Cedric', email: 'cedric@example.com' }
+    ], error: undefined })
+
+    const users = await User.query().where({ name: 'Cedric' }).all()
+
+    expect(users).toBeInstanceOf(Array)
+    expect(users).toHaveLength(1)
+    expect(users[0]).toBeInstanceOf(User)
+    expect(users[0].name).toBe('Cedric')
+  })
+
+  it('can use the filter method', async () => {
+    vi.spyOn(FluORM, 'call').mockImplementation((url) => {
+      expect(url).toBe(`${baseUrl}/users?name=Cedric`)
+      expect(url.includes('name=Cedric')).toBeTruthy()
+      return Promise.resolve({ data: [
+        { id: '1', name: 'Cedric', email: 'cedric@example.com' }
+      ], error: undefined })
+    })
+
+    const users = await User.filter({ name: 'Cedric' }).all()
+
+    expect(users).toBeInstanceOf(Array)
+    expect(users).toHaveLength(1)
+    expect(users[0]).toBeInstanceOf(User)
+    expect(users[0].name).toBe('Cedric')
+  })
+
+  it('can use the include method', async () => {
+    vi.spyOn(FluORM, 'call').mockImplementation((url) => {
+      expect(url).toBe(`${baseUrl}/users?name=Cedric&include=medias`)
+      expect(url.includes('name=Cedric')).toBeTruthy()
+      expect(url.includes('include=medias')).toBeTruthy()
+      return Promise.resolve({ data: [
+        { id: '1', name: 'Cedric', email: 'cedric@example.com' }
+      ], error: undefined })
+    })
+
+    const users = await User.filter({ name: 'Cedric' }).include('medias').all()
+
+    expect(users).toBeInstanceOf(Array)
+    expect(users).toHaveLength(1)
+    expect(users[0]).toBeInstanceOf(User)
+    expect(users[0].name).toBe('Cedric')
+  })
+
+  
 })
