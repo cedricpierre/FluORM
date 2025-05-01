@@ -26,6 +26,15 @@ describe('Models', () => {
     expect(user.name).toBe('Cedric created')
   })
 
+  it('can set the id of an instance and fetch the instance', async () => {
+    vi.spyOn(FluORM, 'call').mockResolvedValue({ data: { id: '123', name: 'Cedric' }, error: undefined })
+
+    const user = await User.id(123).get()
+
+    expect(user).toBeInstanceOf(User)
+    expect(user.id).toBe('123')
+  })
+
   it('can update an instance of a user', async () => {
     vi.spyOn(FluORM, 'call').mockResolvedValue({ data: { id: '123', name: 'Cedric updated' }, error: undefined })
 

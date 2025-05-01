@@ -128,20 +128,26 @@ class User extends Model<IUser> {
 
 Models come with several static methods for querying and manipulating data:
 
-### Fetch methods
-
 - `all()`: Get all records
 - `find(id)`: Find a record by ID
 - `create(data)`: Create a new record
 - `update(id, data)`: Update a record
 - `delete(id)`: Delete a record
 
+## Instance methods
+
+- `get()`: Fetch the instance using the id, if defined
+- `id(id)`: Return a new instance with id.
+- `update(data)`: Update the instance with data
+- `delete()`: Delete the instance
+- `save()`: Save the instance
+
+## Relation methods
+
 - `query()`: Start a new query builder
 - `where(conditions)`: Add where conditions
 - `filter(filters)`: Add filter conditions
-- `include(relations)`: Include related models
-- `id(id)`: Return a new instance with id.
-
+- `include(relations)`: Add include query string
 
 Example usage:
 

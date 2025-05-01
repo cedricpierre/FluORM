@@ -49,7 +49,7 @@ export class Model<A extends Attributes> {
     return Model._queryCache.get(modelClass)
   }
 
-  static id<T extends Model<any>>(id: string | number): Relation<T> {
+  static id<T extends Model<any>>(id: string | number): Model<T> {
     return new this({ id })
   }
 
@@ -94,11 +94,26 @@ export class Model<A extends Attributes> {
     return Model.getRelationBuilder(this, HasManyRelationBuilder).delete(id)
   }
 
+  async get<T extends Model<any>>(): Promise<Model<T>> {
+    if (!this.id) throw new Error('ID is required for get operation')
+
+    const resource = (this.constructor as any).resource
+
+    const data = await HttpClient.call(`${resource}/${this.id}` , {
+      method: Methods.GET,
+    })
+
+    Object.assign(this, data.data)
+    
+    return this
+  }
+
   async save(): Promise<this> {
     try {
       if (this.id) {
         return this.update()
       }
+      
       const resource = (this.constructor as any).resource
       if (!resource) throw new Error('Resource name is not defined')
       
