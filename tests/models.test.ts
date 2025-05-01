@@ -229,9 +229,17 @@ describe('Models', () => {
   })
 
   it('can find users where name is Cedric and is active', async () => {
-    vi.spyOn(FluORM, 'call').mockResolvedValue({ data: [
-      { id: '1', name: 'Cedric', email: 'cedric@example.com' }
-    ], error: undefined })
+    vi.spyOn(FluORM, 'call')
+    .mockImplementation((url) => {
+      console.log(url)
+      expect(url).toBe(`${baseUrl}/users?name=Cedric&email=cedric@example.com&status=active&include=medias`)
+      expect(url.startsWith(baseUrl)).toBeTruthy()
+      expect(url.includes('status=active')).toBeTruthy()
+      expect(url.includes('include=medias')).toBeTruthy()
+      expect(url.includes('email=cedric@example.com')).toBeTruthy()
+      expect(url.includes('name=Cedric')).toBeTruthy()
+      return Promise.resolve({ data: [{ id: '1', name: 'Cedric', email: 'cedric@example.com' }], error: undefined })
+    })
 
     const users = await User
       .where({ name: 'Cedric' })

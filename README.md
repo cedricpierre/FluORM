@@ -122,12 +122,7 @@ Scopes allow you to define reusable query constraints:
 ```typescript
 class User extends Model<IUser> {
   static scopes = {
-    active: () => ({ status: 'active' }),
-    verified: () => ({ email_verified: true }),
-    // Custom scope with parameters
-    ageRange: (min: number, max: number) => ({
-      age: { $gte: min, $lte: max }
-    })
+    active: (query) => query.where({ status: 'active' })
   };
 }
 ```
