@@ -1,4 +1,4 @@
-import { Model, Attributes, HasMany, Cast } from '../../src/index'
+import { Model, Attributes, HasMany, Cast, HasOne } from '../../src/index'
 import { Relation } from '../../src/RelationBuilder'
 
 import { Media } from './Media'
@@ -17,6 +17,9 @@ export class User extends Model<IUser> {
     @HasMany(() => Media)
     medias!: Relation<Media[]>;
 
+    @HasOne(() => Media)
+    picture!: Relation<Media>;
+
     @Cast(() => Thumbnail)
     thumbnail!: Thumbnail
 
@@ -25,6 +28,6 @@ export class User extends Model<IUser> {
 
 
     static scopes = {
-        active: () => ({ status: 'active' }),
+        active: (query: Relation<User>) => query.where({ status: 'active' }),
     }
 }

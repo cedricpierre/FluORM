@@ -39,4 +39,45 @@ describe('Models', () => {
 
     await user.delete()
   })
+
+  it('can have a relation HasOne', async () => {
+    
+    vi.spyOn(FluORM, 'call').mockResolvedValue({ data: { id: '123', url: 'https://example.com/thumbnail.jpg' }, error: undefined })
+
+    const picture = await user.picture.get()
+
+    expect(picture).toBeInstanceOf(Media)
+    expect(picture.id).toBe('123')
+    expect(picture.url).toBe('https://example.com/thumbnail.jpg')
+  })
+
+  it('can update a relation HasOne', async () => {
+    vi.spyOn(FluORM, 'call').mockResolvedValue({ data: { id: '123', url: 'https://example.com/thumbnail-updated.jpg' }, error: undefined })
+
+    const picture = await user.picture.update({ url: 'https://example.com/thumbnail-updated.jpg' })
+
+    expect(picture).toBeInstanceOf(Media)
+    expect(picture.id).toBe('123')
+    expect(picture.url).toBe('https://example.com/thumbnail-updated.jpg')
+  })
+
+  it('can delete a relation HasOne', async () => {
+    vi.spyOn(FluORM, 'call').mockResolvedValue({ data: undefined, error: undefined })
+
+    await user.picture.delete()
+  })
+
+  it('can have a relation HasMany', async () => {
+
+    vi.spyOn(FluORM, 'call').mockResolvedValue({ data: [
+      { id: '1', name: 'Photo 1', url: 'https://example.com/photo1.jpg' },
+      { id: '2', name: 'Photo 2', url: 'https://example.com/photo2.jpg' }
+    ], error: undefined })
+
+    const medias = await user.medias.all()
+
+    expect(medias).toBeInstanceOf(Array)
+    expect(medias).toHaveLength(2)
+    expect(medias.every((media: Media) => media instanceof Media)).toBe(true)
+  })
 })

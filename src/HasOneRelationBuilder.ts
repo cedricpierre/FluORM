@@ -3,11 +3,17 @@ import { HttpClient, Methods } from "./HttpClient"
 import { RelationBuilder } from "./RelationBuilder"
 
 export class HasOneRelationBuilder<T extends Model<any>> extends RelationBuilder<T> {
+    async get() {
+        const response = await HttpClient.call(`${this.path}/${this.relatedModel.id}`, { method: Methods.GET })
+        return new (this.relatedModel as any)(response.data)
+    }
+
     async update(data: any) {
         const updated = await HttpClient.call(`${this.path}/${this.relatedModel.id}`, {
             method: Methods.PATCH,
             body: data
         })
+        console.log(updated)
         return new (this.relatedModel as any)(updated.data)
     }
 

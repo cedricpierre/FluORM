@@ -21,8 +21,8 @@ export class RelationBuilder<T extends Model<any>> {
 
         if (this.relatedModel.scopes) {
             Object.entries(this.relatedModel.scopes).forEach(([name, scope]) => {
-                (this as any)[name] = () => {
-                    return this.where(scope as Record<string, any>)
+                (this as any)[name] = (...args: any[]) => {
+                    return (scope as any)(this, ...args)
                 }
             })
         }
@@ -79,7 +79,7 @@ export class RelationBuilder<T extends Model<any>> {
     protected buildUrl() {
         const url = this.queryBuilder.path(this.path).toUrl()
         this.queryBuilder.reset()
-        
+
         return decodeURIComponent(`${HttpClient.options.baseUrl}/${url}`)
     }
 }
