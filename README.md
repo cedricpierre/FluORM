@@ -202,6 +202,33 @@ await user.update();
 await user.delete();
 ```
 
+## Using relations
+
+You can use the relations declared in the model to create API calls.
+
+```typescript
+const user = User.find(1)
+
+// Will create an API call: GET /users/1/medias
+user.medias.all()
+
+// Will create an API call: GET /users/1/medias/2
+user.medias.find(2)
+
+// Will create an API call: GET /users/1/medias/2/thumbnails
+user.medias.id(2).thumbnails.all()
+```
+
+### Difference between id() and find()
+
+```typescript
+const user = User.find(1) // Will make an API call to /users/1
+
+const user = User.id(1) // return an instance of a new User with id equals 1. Then this instance can be used to query relations.
+
+user.medias.all() // Will create an API call: GET /users/1/medias
+```
+
 ## Additional Methods
 
 ### toObject()
