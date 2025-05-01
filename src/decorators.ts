@@ -10,15 +10,16 @@ const makeRelation = (
     relationBuilderFactory: Constructor<RelationBuilder<any>>,
     resource?: string
 ) => {
-    
     return function (target: any, key: string | symbol) {
         // Initialize the property on the prototype
         Object.defineProperty(target, key, {
             get(this: Model<any>) {
+                const path = (this.path ? `${this.path}/` : '') + (resource ?? String(key))
+
                 return new relationBuilderFactory(
                     modelFactory,
                     undefined,
-                    resource ?? String(key)
+                    path
                 );
             },
             enumerable: true,

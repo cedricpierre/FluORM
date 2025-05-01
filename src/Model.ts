@@ -9,9 +9,9 @@ export interface Attributes extends Record<string, any> {
 
 export class Model<A extends Attributes> {
   static scopes?: Record<string, (query: RelationBuilder<any>) => RelationBuilder<any>>
+  #path: string
 
   id?: string | number
-  _path?: string
   [key: string]: any  
 
   static resource: string
@@ -21,7 +21,22 @@ export class Model<A extends Attributes> {
     if (data) {
       Object.assign(this, data)
     }
+
+    this.#path = (this.constructor as any).resource
+
+    if (this.id) {
+      this.path += `/${this.id}`
+    }
+
     return this
+  }
+
+  get path(): string {
+    return this.#path
+  }
+
+  set path(path: string) {
+    this.#path = path
   }
 
   private static getRelationBuilder<T extends Model<any>>(
@@ -35,7 +50,7 @@ export class Model<A extends Attributes> {
   }
 
   static id<T extends Model<any>>(id: string | number): Relation<T> {
-    return Model.getRelationBuilder(this, HasOneRelationBuilder).id(id)
+    return new this({ id })
   }
 
   static query<T extends Model<any>>(this: new (...args: any[]) => T): Relation<T> {

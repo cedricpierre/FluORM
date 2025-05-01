@@ -6,6 +6,8 @@ export class URLQueryBuilder {
     private _offset?: number
     private _page?: number
     private _perPage?: number
+    private _id?: string | number
+    private _path: string = ''
 
     reset(): this {
         this._filters = {}
@@ -15,9 +17,16 @@ export class URLQueryBuilder {
         this._offset = undefined
         this._page = undefined
         this._perPage = undefined
+        this._id = undefined
+        this._path = ''
         return this
     }
     
+    id(id: string | number): this {
+        this._id = id
+        return this
+    }
+
     where(obj: Record<string, any>): this {
         return this.filter(obj)
     }
@@ -47,6 +56,10 @@ export class URLQueryBuilder {
         return this
     }
 
+    path(path: string): this {
+        this._path = path
+        return this
+    }
 
     page(n: number): this {
         this._page = n
@@ -74,5 +87,20 @@ export class URLQueryBuilder {
         return Object.entries(this.toObject())
             .map(([key, value]) => `${key}=${value}`)
             .join('&')
+    }
+
+    toUrl(): string {
+
+        let url = this._path
+
+        if (this._id) {
+            url += `/${String(this._id)}`
+        }
+
+        if (this.toQueryString()) {
+            url += `?${this.toQueryString()}`
+        }
+
+        return url
     }
 }

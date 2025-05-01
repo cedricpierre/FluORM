@@ -30,14 +30,20 @@ export class RelationBuilder<T extends Model<any>> {
 
     id(id: string | number): Model<T> { 
         const model = new (this.relatedModel as any)({ id })
-        model._path = `${this.path}/${id}`
+        model.path = `${this.path}/${id}`
         return model
     }
 
     async find(id: string | number): Promise<Model<T>> {
-        const url = `${this.path}/${id}${this.queryBuilder.toQueryString() ? `?${this.queryBuilder.toQueryString()}` : ''}`
-        const response = await HttpClient.call(url)
-        return new (this.relatedModel as any)(response.data)
+        
+        this.queryBuilder.id(id)
+
+        const response = await HttpClient.call(this.buildUrl())
+        const model = new (this.relatedModel as any)(response.data)
+
+        model.path = `${this.path}/${id}`
+
+        return model
     }
 
     where(where: Record<string, any>): RelationBuilder<T> { 
@@ -69,11 +75,11 @@ export class RelationBuilder<T extends Model<any>> {
         this.queryBuilder.offset(n)
         return this
     }
-    
+
     protected buildUrl() {
-        const queryString = this.queryBuilder.toQueryString()
-        const url = queryString ? `${this.path}?${queryString}` : this.path
+        const url = this.queryBuilder.path(this.path).toUrl()
         this.queryBuilder.reset()
+        
         return decodeURIComponent(`${HttpClient.options.baseUrl}/${url}`)
     }
 }
