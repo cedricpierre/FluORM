@@ -8,13 +8,11 @@ describe('HttpClient', () => {
   
   it('can make a GET request', async () => {
     vi.spyOn(HttpClient, 'call').mockResolvedValue({
-      data: {
-        message: 'Hello, world!'
-      }
+      message: 'Hello, world!'
     })
     const response = await HttpClient.call('https://jsonplaceholder.typicode.com/posts')
 
-    expect(response.data).not.toBeNull()
+    expect(response).not.toBeNull()
   })
 
   it('doest have a baseUrl', async () => {
@@ -29,6 +27,6 @@ describe('HttpClient', () => {
 
     const response = await HttpClient.call('posts')
 
-    expect(response.data).not.toBeNull()
+    expect(response).not.toBeNull()
   })
 })

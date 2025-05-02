@@ -17,7 +17,7 @@ describe('Models', () => {
 
 
   it('can save a user', async () => {
-    vi.spyOn(FluORM, 'call').mockResolvedValue({ data: { id: '123', name: 'Cedric created' }, error: undefined })
+    vi.spyOn(FluORM, 'call').mockResolvedValue({ id: '123', name: 'Cedric created' })
 
     await user.save()
 
@@ -27,7 +27,7 @@ describe('Models', () => {
   })
 
   it('can set the id of an instance and fetch the instance', async () => {
-    vi.spyOn(FluORM, 'call').mockResolvedValue({ data: { id: '123', name: 'Cedric' }, error: undefined })
+    vi.spyOn(FluORM, 'call').mockResolvedValue({ id: '123', name: 'Cedric' })
 
     const user = await User.id(123).get()
 
@@ -36,7 +36,7 @@ describe('Models', () => {
   })
 
   it('can update an instance of a user', async () => {
-    vi.spyOn(FluORM, 'call').mockResolvedValue({ data: { id: '123', name: 'Cedric updated' }, error: undefined })
+    vi.spyOn(FluORM, 'call').mockResolvedValue( { id: '123', name: 'Cedric updated' })
 
     await user.update({ name: 'Cedric updated' })
 
@@ -44,14 +44,14 @@ describe('Models', () => {
   })
 
   it('can delete an instance of a user', async () => {
-    vi.spyOn(FluORM, 'call').mockResolvedValue({ data: undefined, error: undefined })
+    vi.spyOn(FluORM, 'call').mockResolvedValue(true)
 
     await user.delete()
   })
 
   it('can have a relation HasOne', async () => {
     
-    vi.spyOn(FluORM, 'call').mockResolvedValue({ data: { id: '123', url: 'https://example.com/thumbnail.jpg' }, error: undefined })
+    vi.spyOn(FluORM, 'call').mockResolvedValue({ id: '123', url: 'https://example.com/thumbnail.jpg' })
 
     const picture = await user.picture.get()
 
@@ -61,7 +61,7 @@ describe('Models', () => {
   })
 
   it('can update a relation HasOne', async () => {
-    vi.spyOn(FluORM, 'call').mockResolvedValue({ data: { id: '123', url: 'https://example.com/thumbnail-updated.jpg' }, error: undefined })
+    vi.spyOn(FluORM, 'call').mockResolvedValue({ id: '123', url: 'https://example.com/thumbnail-updated.jpg' })
 
     const picture = await user.picture.update({ url: 'https://example.com/thumbnail-updated.jpg' })
 
@@ -71,17 +71,17 @@ describe('Models', () => {
   })
 
   it('can delete a relation HasOne', async () => {
-    vi.spyOn(FluORM, 'call').mockResolvedValue({ data: undefined, error: undefined })
+    vi.spyOn(FluORM, 'call').mockResolvedValue(true)
 
     await user.picture.delete()
   })
 
   it('can have a relation HasMany', async () => {
 
-    vi.spyOn(FluORM, 'call').mockResolvedValue({ data: [
+    vi.spyOn(FluORM, 'call').mockResolvedValue([
       { id: '1', name: 'Photo 1', url: 'https://example.com/photo1.jpg' },
       { id: '2', name: 'Photo 2', url: 'https://example.com/photo2.jpg' }
-    ], error: undefined })
+    ])
 
     const medias = await user.medias.all()
 

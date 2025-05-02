@@ -103,8 +103,8 @@ export class Model<A extends Attributes> {
       method: Methods.GET,
     })
 
-    Object.assign(this, data.data)
-    
+    Object.assign(this, data)
+
     return this
   }
 
@@ -121,7 +121,7 @@ export class Model<A extends Attributes> {
         method: Methods.POST,
         body: { ...this }
       })
-      Object.assign(this, data.data)
+      Object.assign(this, data)
       return this
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -142,7 +142,7 @@ export class Model<A extends Attributes> {
         method: Methods.PATCH,
         body: { ...this }
       })
-      Object.assign(this, updated.data)
+      Object.assign(this, updated)
       return this
     } catch (error: unknown) {
       if (error instanceof Error) {

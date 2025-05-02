@@ -39,7 +39,7 @@ export class RelationBuilder<T extends Model<any>> {
         this.queryBuilder.id(id)
 
         const response = await HttpClient.call(this.buildUrl())
-        const model = new (this.relatedModel as any)(response.data)
+        const model = new (this.relatedModel as any)(response)
 
         model.path = `${this.path}/${id}`
 

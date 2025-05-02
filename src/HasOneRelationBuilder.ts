@@ -5,7 +5,7 @@ import { RelationBuilder } from "./RelationBuilder"
 export class HasOneRelationBuilder<T extends Model<any>> extends RelationBuilder<T> {
     async get() {
         const response = await HttpClient.call(`${this.path}/${this.relatedModel.id}`, { method: Methods.GET })
-        return new (this.relatedModel as any)(response.data)
+        return new (this.relatedModel as any)(response)
     }
 
     async update(data: any) {
@@ -13,7 +13,7 @@ export class HasOneRelationBuilder<T extends Model<any>> extends RelationBuilder
             method: Methods.PATCH,
             body: data
         })
-        return new (this.relatedModel as any)(updated.data)
+        return new (this.relatedModel as any)(updated)
     }
 
     async delete() {

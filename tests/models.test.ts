@@ -19,7 +19,7 @@ describe('Models', () => {
   
 
   it('can create a user', async () => {
-    vi.spyOn(FluORM, 'call').mockResolvedValue({ data: { id: '123', name: 'Cedric', email: 'cedric@example.com' }, error: undefined })
+    vi.spyOn(FluORM, 'call').mockResolvedValue({ id: '123', name: 'Cedric', email: 'cedric@example.com' })
 
     user = new User({ name: 'Cedric', email: 'cedric@example.com' })
     await user.save()
@@ -28,16 +28,16 @@ describe('Models', () => {
     expect(user.id).toBe('123')
     expect(user.name).toBe('Cedric')
 
-    vi.spyOn(FluORM, 'call').mockResolvedValue({ data: [
+    vi.spyOn(FluORM, 'call').mockResolvedValue([
       { id: '456', name: 'Cedric', email: 'cedric@example.com' }
-    ], error: undefined })
+    ])
 
   })
 
   it('can fetch all users', async () => {
-    vi.spyOn(FluORM, 'call').mockResolvedValue({ data: [
+    vi.spyOn(FluORM, 'call').mockResolvedValue([
       { id: '456', name: 'Cedric', email: 'cedric@example.com' }
-    ], error: undefined })
+    ])
 
     const users = await User.all()
 
@@ -106,10 +106,10 @@ describe('Models', () => {
   })
   
   it('can fetch all users', async () => {
-    vi.spyOn(FluORM, 'call').mockResolvedValue({ data: [
+    vi.spyOn(FluORM, 'call').mockResolvedValue([
       { id: '1', name: 'Cedric', email: 'cedric@example.com' },
       { id: '2', name: 'Johana', email: 'johana@example.com' }
-    ], error: undefined })
+    ])
 
     const users = await User.all()
 
@@ -119,14 +119,13 @@ describe('Models', () => {
   })
 
   it('can find a user by ID', async () => {
-    vi.spyOn(FluORM, 'call').mockResolvedValue({
-      data: {
+    vi.spyOn(FluORM, 'call').mockResolvedValue(
+      {
         id: '123',
         name: 'Cedric',
         email: 'cedric@example.com'
-      },
-      error: undefined
-    })
+      }
+    )
 
     user = await User.find('123')
 
@@ -136,7 +135,7 @@ describe('Models', () => {
   })
 
   it('can save an instance of a user', async () => {
-    vi.spyOn(FluORM, 'call').mockResolvedValue({ data: { id: '123', name: 'Cedric updated' }, error: undefined })
+    vi.spyOn(FluORM, 'call').mockResolvedValue( { id: '123', name: 'Cedric updated' })
 
     await user.save()
 
@@ -144,7 +143,7 @@ describe('Models', () => {
   })
 
   it('can update a user by ID', async () => {
-    vi.spyOn(FluORM, 'call').mockResolvedValue({ data: { name: 'Cedric updated' }, error: undefined })
+    vi.spyOn(FluORM, 'call').mockResolvedValue({ name: 'Cedric updated' })
 
     const updatedUser = await User.update('123', { name: 'Cedric updated' })
 
@@ -153,7 +152,7 @@ describe('Models', () => {
   })
 
   it('can create a user by ID', async () => {
-    vi.spyOn(FluORM, 'call').mockResolvedValue({ data: { id: '123', name: 'Cedric new' }, error: undefined })
+    vi.spyOn(FluORM, 'call').mockResolvedValue({ id: '123', name: 'Cedric new' })
 
     const createdUser = await User.create({ name: 'Cedric new' })
 
@@ -162,16 +161,16 @@ describe('Models', () => {
   })
 
   it('can delete a user by ID', async () => {
-    vi.spyOn(FluORM, 'call').mockResolvedValue({ data: undefined, error: undefined })
+    vi.spyOn(FluORM, 'call').mockResolvedValue(true)
 
     await User.delete('123')
   })
 
   it('can fetch all medias from user', async () => {
-    vi.spyOn(FluORM, 'call').mockResolvedValue({ data: [
+    vi.spyOn(FluORM, 'call').mockResolvedValue([
       { id: '1', name: 'Photo 1', url: 'https://example.com/photo1.jpg' },
       { id: '2', name: 'Photo 2', url: 'https://example.com/photo2.jpg' }
-    ], error: undefined })
+    ])
 
     medias = await user.medias.all()
 
@@ -183,9 +182,9 @@ describe('Models', () => {
 
 
   it('can fetch all medias from user with pagination', async () => {
-    vi.spyOn(FluORM, 'call').mockResolvedValue({ data: [
+    vi.spyOn(FluORM, 'call').mockResolvedValue([
       { id: '1', name: 'Photo', url: 'https://example.com/photo1.jpg' }
-    ], error: undefined })
+    ])
     medias = await user.medias.where({ name: 'Photo' }).paginate(1, 1)
 
     expect(medias).toBeInstanceOf(Array)
@@ -200,11 +199,11 @@ describe('Models', () => {
     expect(media.id).toBe('1')
     expect(media.url).toBe('https://example.com/photo1.jpg')
 
-    vi.spyOn(FluORM, 'call').mockResolvedValue({ data: user, error: undefined })
+    vi.spyOn(FluORM, 'call').mockResolvedValue(user)
 
-    vi.spyOn(FluORM, 'call').mockResolvedValue({ data: [
+    vi.spyOn(FluORM, 'call').mockResolvedValue([
       { id: '1', size: 'sm', url: 'https://example.com/photo1.jpg' }
-    ], error: undefined })
+    ])
 
     const allThumbnails = await media.thumbnails.all()
 
@@ -215,10 +214,10 @@ describe('Models', () => {
     expect(thumbnail.size).toBe('sm')
     expect(thumbnail.url).toBe('https://example.com/photo1.jpg')
 
-    vi.spyOn(FluORM, 'call').mockResolvedValue({ data: [
+    vi.spyOn(FluORM, 'call').mockResolvedValue([
       { id: '1', size: 'sm', url: 'https://example.com/photo1.jpg' },
       { id: '2', size: 'md', url: 'https://example.com/photo2.jpg' }
-    ], error: undefined })
+    ])
 
     const thumbnails = await media.thumbnails.all()
 
@@ -238,7 +237,7 @@ describe('Models', () => {
       expect(url.includes('include=medias')).toBeTruthy()
       expect(url.includes('email=cedric@example.com')).toBeTruthy()
       expect(url.includes('name=Cedric')).toBeTruthy()
-      return Promise.resolve({ data: [{ id: '1', name: 'Cedric', email: 'cedric@example.com' }], error: undefined })
+      return Promise.resolve([{ id: '1', name: 'Cedric', email: 'cedric@example.com' }])
     })
 
     const users = await User
@@ -264,7 +263,7 @@ describe('Models', () => {
       expect(url.includes('include=medias,profile')).toBeTruthy()
       expect(url.includes('page=1')).toBeTruthy()
       expect(url.includes('per_page=10')).toBeTruthy()
-      return Promise.resolve({ data: [], error: undefined })
+      return Promise.resolve([])
     })
 
     await User
@@ -287,13 +286,10 @@ describe('Models', () => {
   it('generates correct URL with relation and query parameters', async () => {
 
     vi.spyOn(FluORM, 'call').mockResolvedValue({
-      data: {
         id: '1',
         name: 'Cedric',
         email: 'cedric@example.com'
-      },
-      error: undefined
-    })
+      })
 
     const user = await User.find(1)
 
@@ -301,12 +297,10 @@ describe('Models', () => {
       expect(url).toBe(`${baseUrl}/users/1/medias/2?include=thumbnails`)
       expect(url.includes('include=thumbnails')).toBeTruthy()
 
-      return Promise.resolve({ data: 
-        { id: '2',
+      return Promise.resolve({ id: '2',
           name: 'thumbnail',
           url: 'https://example.com/thumbnail.jpg'
-        }
-      , error: undefined })
+        })
     })    
   
     const media = await user.medias.include('thumbnails').find(2)
@@ -319,10 +313,10 @@ describe('Models', () => {
     vi.spyOn(FluORM, 'call').mockImplementation((url) => {
       expect(url).toBe(`${baseUrl}/users/1/medias/2/thumbnails?include=size`)
       expect(url.includes('include=size')).toBeTruthy()
-      return Promise.resolve({ data: [
+      return Promise.resolve([
         { id: '1', size: 'sm', url: 'https://example.com/thumbnail1.jpg' },
         { id: '2', size: 'md', url: 'https://example.com/thumbnail2.jpg' }
-      ], error: undefined })
+      ])
     })    
 
     const thumbnails = await media.thumbnails.include('size').all()
@@ -338,7 +332,7 @@ describe('Models', () => {
     vi.spyOn(FluORM, 'call').mockImplementation((url) => {
       expect(url).toBe(`${baseUrl}/users/1/medias/2/thumbnails?include=size`)
       expect(url.includes('include=size')).toBeTruthy()
-      return Promise.resolve({ data: [], error: undefined })
+      return Promise.resolve([])
     })
 
     await User.id(1).medias.id(2).thumbnails.include('size').all();
@@ -348,11 +342,11 @@ describe('Models', () => {
     vi.spyOn(FluORM, 'call').mockImplementation((url) => {
       expect(url).toBe(`${baseUrl}/users?name=Cedric`)
       expect(url.includes('name=Cedric')).toBeTruthy()
-      return Promise.resolve({ data: [], error: undefined })
+      return Promise.resolve([])
     })
-    .mockResolvedValue({ data: [
+    .mockResolvedValue([
       { id: '1', name: 'Cedric', email: 'cedric@example.com' }
-    ], error: undefined })
+    ])
 
     const users = await User.query().where({ name: 'Cedric' }).all()
 
@@ -366,9 +360,9 @@ describe('Models', () => {
     vi.spyOn(FluORM, 'call').mockImplementation((url) => {
       expect(url).toBe(`${baseUrl}/users?name=Cedric`)
       expect(url.includes('name=Cedric')).toBeTruthy()
-      return Promise.resolve({ data: [
+      return Promise.resolve([
         { id: '1', name: 'Cedric', email: 'cedric@example.com' }
-      ], error: undefined })
+      ])
     })
 
     const users = await User.filter({ name: 'Cedric' }).all()
@@ -384,9 +378,9 @@ describe('Models', () => {
       expect(url).toBe(`${baseUrl}/users?name=Cedric&include=medias`)
       expect(url.includes('name=Cedric')).toBeTruthy()
       expect(url.includes('include=medias')).toBeTruthy()
-      return Promise.resolve({ data: [
+      return Promise.resolve([
         { id: '1', name: 'Cedric', email: 'cedric@example.com' }
-      ], error: undefined })
+      ])
     })
 
     const users = await User.filter({ name: 'Cedric' }).include('medias').all()

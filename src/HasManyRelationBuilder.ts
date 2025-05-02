@@ -5,7 +5,8 @@ import { RelationBuilder } from "./RelationBuilder"
 export class HasManyRelationBuilder<T extends Model<any>> extends RelationBuilder<T> {
     async all() {
         const list = await HttpClient.call(this.buildUrl())
-        return list.data?.map((i: any) => new (this.relatedModel as any)(i))
+
+        return list?.map((i: any) => new (this.relatedModel as any)(i))
     }
 
     async create(payload: any) {
@@ -13,7 +14,7 @@ export class HasManyRelationBuilder<T extends Model<any>> extends RelationBuilde
             method: Methods.POST,
             body: payload
         })
-        return new (this.relatedModel as any)(data.data)
+        return new (this.relatedModel as any)(data)
     }
 
     async delete(id: string | number) {
@@ -25,7 +26,7 @@ export class HasManyRelationBuilder<T extends Model<any>> extends RelationBuilde
             method: Methods.PUT,
             body: data
         })
-        return new (this.relatedModel as any)(response.data)
+        return new (this.relatedModel as any)(response)
     }
 
     async paginate(page = 1, perPage = 10) {
@@ -35,6 +36,6 @@ export class HasManyRelationBuilder<T extends Model<any>> extends RelationBuilde
             .limit(perPage)
 
         const list = await HttpClient.call(this.buildUrl())
-        return list.data?.map((i: any) => new (this.relatedModel as any)(i))
+        return list?.map((i: any) => new (this.relatedModel as any)(i))
     }
 }

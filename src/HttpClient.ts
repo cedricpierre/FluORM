@@ -1,7 +1,13 @@
 export class HttpClient {
   static options: HttpClientOptions = {
     baseUrl: '',
-    request: undefined,
+    request: {
+      options: {
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      }
+    } as unknown as Request,
     requestInterceptor: undefined,
     responseInterceptor: undefined,
     errorInterceptor: undefined,
@@ -23,26 +29,29 @@ export class HttpClient {
 
     url = `${this.options.baseUrl}/${url}`
 
-    const finalOptions = { ...options } as RequestOptions
+    const finalOptions = { ...options, ...this.options?.request?.options } as RequestOptions
     const request = { url, options: finalOptions } as Request
 
     if (this.options.requestInterceptor) {
       Object.assign(request, this.options.requestInterceptor.call(this, request))
     }
 
-    let response = { data: null, error: null } as unknown as Response<T>
+    let response = {} as unknown as Response<T>
 
     if (this.options.requestHandler) {
       response = await this.options.requestHandler.call(this, request)
     } else {
+      
+      if (request.options.headers && request.options.headers['Content-Type'] === 'application/json') {
+        request.options.body = JSON.stringify(request.options.body)
+      }
+
       const resp = await fetch(request.url, request.options as RequestInit);
       if (resp.ok) {
         response = await resp.json() as Response<T>;
       }
     }
 
-    if (response.error) throw new Error(response.error.message)
-  
     if (this.options.responseInterceptor) {
       response = this.options.responseInterceptor.call(this, response)
     }
@@ -66,7 +75,7 @@ export type MethodType = keyof typeof Methods;
 
 interface HttpClientOptions {
   baseUrl?: string
-  request?: RequestOptions,
+  request?: Request,
   requestInterceptor?: (request: Request) => Request
   responseInterceptor?: (response: Response) => Response
   errorInterceptor?: (error: Error) => void
@@ -79,10 +88,7 @@ export interface Request {
   options: RequestOptions
 }
 
-export interface Response<T = any> {
-  data: T
-  error?: Error
-}
+export type Response<T = any> = T | T[]
 
 export interface RequestOptions {
   body?: any,
