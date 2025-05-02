@@ -2,6 +2,7 @@
 import { expect, describe, it, vi } from 'vitest'
 import { User } from '../examples/models/User'
 import { Post } from '../examples/models/Post'
+import { Comment } from '../examples/models/Comment'
 import { FluORM } from '../src'
 
 FluORM.configure({
@@ -47,5 +48,11 @@ describe('API', () => {
         expect(comments).toBeInstanceOf(Array)
         expect(comments.length).toBeGreaterThan(0)
     })
-    
+
+    it('Should create a comment', async () => {
+        const comment = await Post.id(1).comments.create({ name: 'Cedric', email: 'cedric@example.com' })
+        expect(comment).toBeDefined()
+        expect(comment).toBeInstanceOf(Comment)
+        expect(comment.name).toBe('Cedric')
+    })
 })
