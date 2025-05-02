@@ -1,7 +1,8 @@
 
 import { expect, describe, it, vi } from 'vitest'
 import { User } from '../examples/models/User'
-import { FluORM, HttpClient } from '../src'
+import { Post } from '../examples/models/Post'
+import { FluORM } from '../src'
 
 FluORM.configure({
     baseUrl: 'https://jsonplaceholder.typicode.com'
@@ -35,11 +36,16 @@ describe('API', () => {
         expect(user).toBeInstanceOf(User)
         expect(user.name).toBe('Cedric updated')
     })
-    
+
+    it('should delete a user', async () => {
+        await User.delete(1)
+    })
+
+    it('Should fetch all comments from a post', async () => {
+        const comments = await Post.id(1).comments.all()
+        expect(comments).toBeDefined()
+        expect(comments).toBeInstanceOf(Array)
+        expect(comments.length).toBeGreaterThan(0)
+    })
     
 })
-
-
-
-
-

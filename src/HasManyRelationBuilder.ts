@@ -5,7 +5,6 @@ import { RelationBuilder } from "./RelationBuilder"
 export class HasManyRelationBuilder<T extends Model<any>> extends RelationBuilder<T> {
     async all() {
         const list = await HttpClient.call(this.buildUrl())
-
         return list?.map((i: any) => new (this.relatedModel as any)(i))
     }
 

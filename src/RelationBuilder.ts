@@ -80,6 +80,6 @@ export class RelationBuilder<T extends Model<any>> {
         const url = this.queryBuilder.path(this.path).toUrl()
         this.queryBuilder.reset()
 
-        return decodeURIComponent(`${HttpClient.options.baseUrl}/${url}`)
+        return decodeURIComponent(`${url}`)
     }
 }

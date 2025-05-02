@@ -230,9 +230,7 @@ describe('Models', () => {
   it('can find users where name is Cedric and is active', async () => {
     vi.spyOn(FluORM, 'call')
     .mockImplementation((url) => {
-      console.log(url)
-      expect(url).toBe(`${baseUrl}/users?name=Cedric&email=cedric@example.com&status=active&include=medias`)
-      expect(url.startsWith(baseUrl)).toBeTruthy()
+      expect(url).toBe(`users?name=Cedric&email=cedric@example.com&status=active&include=medias`)
       expect(url.includes('status=active')).toBeTruthy()
       expect(url.includes('include=medias')).toBeTruthy()
       expect(url.includes('email=cedric@example.com')).toBeTruthy()
@@ -256,8 +254,7 @@ describe('Models', () => {
   it('generates correct URL with query parameters', async () => {
     const mockCall = vi.spyOn(FluORM, 'call')
     mockCall.mockImplementation((url) => {
-      expect(url).toBe(`${baseUrl}/users?name=Cedric&email=cedric@example.com&include=medias,profile&sort=-created_at&limit=10&offset=0&page=1&per_page=10`)
-      expect(url.startsWith(baseUrl)).toBeTruthy()
+      expect(url).toBe(`users?name=Cedric&email=cedric@example.com&include=medias,profile&sort=-created_at&limit=10&offset=0&page=1&per_page=10`)
       expect(url.includes('name=Cedric')).toBeTruthy()
       expect(url.includes('email=cedric@example.com')).toBeTruthy()
       expect(url.includes('include=medias,profile')).toBeTruthy()
@@ -294,7 +291,7 @@ describe('Models', () => {
     const user = await User.find(1)
 
     vi.spyOn(FluORM, 'call').mockImplementation((url) => {
-      expect(url).toBe(`${baseUrl}/users/1/medias/2?include=thumbnails`)
+      expect(url).toBe(`users/1/medias/2?include=thumbnails`)
       expect(url.includes('include=thumbnails')).toBeTruthy()
 
       return Promise.resolve({ id: '2',
@@ -311,7 +308,7 @@ describe('Models', () => {
     expect(media.url).toBe('https://example.com/thumbnail.jpg')
 
     vi.spyOn(FluORM, 'call').mockImplementation((url) => {
-      expect(url).toBe(`${baseUrl}/users/1/medias/2/thumbnails?include=size`)
+      expect(url).toBe(`users/1/medias/2/thumbnails?include=size`)
       expect(url.includes('include=size')).toBeTruthy()
       return Promise.resolve([
         { id: '1', size: 'sm', url: 'https://example.com/thumbnail1.jpg' },
@@ -330,7 +327,7 @@ describe('Models', () => {
   it('generates deep nested relations', async () => {
 
     vi.spyOn(FluORM, 'call').mockImplementation((url) => {
-      expect(url).toBe(`${baseUrl}/users/1/medias/2/thumbnails?include=size`)
+      expect(url).toBe(`users/1/medias/2/thumbnails?include=size`)
       expect(url.includes('include=size')).toBeTruthy()
       return Promise.resolve([])
     })
@@ -340,7 +337,7 @@ describe('Models', () => {
 
   it('can use the query method', async () => {
     vi.spyOn(FluORM, 'call').mockImplementation((url) => {
-      expect(url).toBe(`${baseUrl}/users?name=Cedric`)
+      expect(url).toBe(`users?name=Cedric`)
       expect(url.includes('name=Cedric')).toBeTruthy()
       return Promise.resolve([])
     })
@@ -358,7 +355,7 @@ describe('Models', () => {
 
   it('can use the filter method', async () => {
     vi.spyOn(FluORM, 'call').mockImplementation((url) => {
-      expect(url).toBe(`${baseUrl}/users?name=Cedric`)
+      expect(url).toBe(`users?name=Cedric`)
       expect(url.includes('name=Cedric')).toBeTruthy()
       return Promise.resolve([
         { id: '1', name: 'Cedric', email: 'cedric@example.com' }
@@ -375,7 +372,7 @@ describe('Models', () => {
 
   it('can use the include method', async () => {
     vi.spyOn(FluORM, 'call').mockImplementation((url) => {
-      expect(url).toBe(`${baseUrl}/users?name=Cedric&include=medias`)
+      expect(url).toBe(`users?name=Cedric&include=medias`)
       expect(url.includes('name=Cedric')).toBeTruthy()
       expect(url.includes('include=medias')).toBeTruthy()
       return Promise.resolve([
