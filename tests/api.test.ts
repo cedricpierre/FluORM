@@ -4,6 +4,7 @@ import { User } from '../examples/models/User'
 import { Post } from '../examples/models/Post'
 import { Comment } from '../examples/models/Comment'
 import { FluORM, HttpClient } from '../src'
+import { Company } from '../examples/models/Company'
 
 FluORM.configure({
     baseUrl: 'https://jsonplaceholder.typicode.com'
@@ -20,6 +21,9 @@ describe('API', () => {
     it('should fetch a user by id', async () => {
         const user = await User.find(1)
         expect(user).toBeDefined()
+        
+        expect(user.company).toBeDefined()
+        expect(user.company).toBeInstanceOf(Company)
     })
 
     it('should create a user', async () => {
@@ -66,5 +70,30 @@ describe('API', () => {
 
         const response = await User.find(1)
         expect(response.name).toBe('Cedric')
+    })
+
+    it('can fetch one post', async () => {
+        const post = await Post.find(1)
+
+        expect(post).toBeDefined()
+        expect(post).toBeInstanceOf(Post)
+
+        let comments = await post.comments.all()
+        expect(comments).toBeDefined()
+        expect(comments).toBeInstanceOf(Array)
+        expect(comments.length).toBeGreaterThan(0)
+
+        post.update({ title: 'Cedric updated' })
+        expect(post.title).toBe('Cedric updated')
+
+        post.title = 'Cedric updated 2'
+        await post.save()
+        expect(post.title).toBe('Cedric updated 2')
+
+        post.comments.create({ name: 'Cedric', email: 'cedric@example.com' })
+        comments = await post.comments.all()
+        expect(comments).toBeDefined()
+        expect(comments).toBeInstanceOf(Array)
+        expect(comments.length).toBeGreaterThan(0)
     })
 })

@@ -47,7 +47,6 @@ export class HttpClient {
       }
 
       const resp = await fetch(request.url, request.options as RequestInit);
-      console.log(url)
       if (resp.ok) {
         response = await resp.json() as Response<T>;
       }

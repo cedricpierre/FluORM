@@ -1,5 +1,6 @@
 import { Model, Attributes, HasMany, Cast, HasOne } from '../../src/index'
 import { Relation } from '../../src/RelationBuilder'
+import { Company } from './Company'
 
 import { Media } from './Media'
 import { Thumbnail } from './Thumbnail'
@@ -26,6 +27,8 @@ export class User extends Model<IUser> {
     @Cast(() => Thumbnail)
     thumbnails!: Thumbnail[]
 
+    @Cast(() => Company)
+    company!: Company
 
     static scopes = {
         active: (query: Relation<User>) => query.where({ status: 'active' }),
