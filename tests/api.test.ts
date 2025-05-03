@@ -3,7 +3,7 @@ import { expect, describe, it, vi } from 'vitest'
 import { User } from '../examples/models/User'
 import { Post } from '../examples/models/Post'
 import { Comment } from '../examples/models/Comment'
-import { FluORM } from '../src'
+import { FluORM, HttpClient } from '../src'
 
 FluORM.configure({
     baseUrl: 'https://jsonplaceholder.typicode.com'
@@ -54,5 +54,17 @@ describe('API', () => {
         expect(comment).toBeDefined()
         expect(comment).toBeInstanceOf(Comment)
         expect(comment.name).toBe('Cedric')
+    })
+
+    it('can transform the response', async () => {
+        HttpClient.configure({
+            responseInterceptor: (response: Response) => {
+                response.name = 'Cedric'
+                return response
+            }
+        })
+
+        const response = await User.find(1)
+        expect(response.name).toBe('Cedric')
     })
 })
