@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { User } from '../examples/models/User'
 import { FluORM, HttpClient } from '../src/index'
 import { Media } from '../examples/models/Media'
+import { Thumbnail } from '../examples/models/Thumbnail'
 
 const baseUrl = 'http://localhost:3000'
 FluORM.configure({
@@ -44,6 +45,22 @@ describe('Models', () => {
     expect(media).toBeInstanceOf(Array)
     expect(media).toHaveLength(2)
     expect(media[0]).toBeInstanceOf(Media)
+  })
+
+  it('should be able to cast thumbnail', async () => {
+    vi.spyOn(HttpClient, 'call').mockResolvedValue({
+      id: 1,
+      thumbnail: {
+        id: 1,
+        url: 'https://example.com/thumbnail.jpg',
+        width: 100,
+        height: 100,
+      }
+    })
+
+    const user = await User.find(1)
+    expect(user.thumbnail).toBeInstanceOf(Thumbnail)
+    expect(user.thumbnail.url).toBe('https://example.com/thumbnail.jpg')
   })
   
 })
