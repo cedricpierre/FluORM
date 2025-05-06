@@ -134,19 +134,19 @@ class User extends Model<IUser> {
 
 Models come with several static methods for querying and manipulating data:
 
-- `all()`: Get all records
-- `find(id)`: Find a record by ID
-- `create(data)`: Create a new record
-- `update(id, data)`: Update a record
-- `delete(id)`: Delete a record
+- `Model.all()`: Get all records
+- `Model.find(id)`: Find a record by ID
+- `Model.create(data)`: Create a new record
+- `Model.update(id, data)`: Update a record
+- `Model.delete(id)`: Delete a record
 
 ## Instance methods
 
-- `get()`: Fetch the instance using the id, if defined
-- `id(id)`: Return a new instance with id.
-- `update(data)`: Update the instance with data
-- `delete()`: Delete the instance
-- `save()`: Save the instance
+- `model.get()`: Fetch the instance using the id, if defined
+- `model.id(id)`: Return a new instance with id.
+- `model.update(data)`: Update the instance with data
+- `model.delete()`: Delete the instance
+- `model.save()`: Save the instance
 
 ## Relation methods
 
@@ -251,6 +251,35 @@ The `toObject()` method converts a model instance and its related models into a 
 const user = await User.find(1);
 const userObject = user.toObject();
 // Returns a plain object with all properties and nested related models
+```
+
+## Cache
+
+There is a built-in cache mechanism. This is disabled by default.
+
+```typescript
+FluORM.configure({
+    cacheOptions: {
+        enabled: true,
+        ttl: 5 * 60 * 1000 // 5 minutes in milliseconds
+    }
+})
+```
+
+Every request is put into a cache using the resource as a key :
+
+```typescript
+const user = User.find(1)
+// if you fetch the same user later, it will come from the cache.
+```
+
+Manually accessing the cache
+
+```typescript
+// you can access the cache like this :
+const cachedResponse = FluORM.getCache('users/1')
+
+const user = new User(cachedResponse.data)
 ```
 
 ## Error Handling

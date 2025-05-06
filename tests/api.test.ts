@@ -21,7 +21,7 @@ describe('API', () => {
     it('should fetch a user by id', async () => {
         const user = await User.find(1)
         expect(user).toBeDefined()
-        
+
         expect(user.company).toBeDefined()
         expect(user.company).toBeInstanceOf(Company)
     })
@@ -95,5 +95,34 @@ describe('API', () => {
         expect(comments).toBeDefined()
         expect(comments).toBeInstanceOf(Array)
         expect(comments.length).toBeGreaterThan(0)
+    })
+
+    it('can cache the response', async () => {
+        HttpClient.configure({
+            cacheOptions: {
+                enabled: true,
+                ttl: 1000
+            }
+        })
+
+    const response1 = await User.find(1)
+    expect(response1).toBeDefined()
+    expect(response1).toBeInstanceOf(User)
+
+    const cache = HttpClient.getCache("users/1")
+    
+    expect(cache).toBeDefined()
+
+    const user = new User(cache.data)
+    expect(user).toBeDefined()
+    expect(user).toBeInstanceOf(User)
+
+    // Clear cache
+    HttpClient.clearCache()
+
+    // Third call should not use cache
+    const response3 = await User.find(1)
+    expect(response3).toBeDefined()
+    expect(response3).toBeInstanceOf(User)
     })
 })
