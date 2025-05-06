@@ -90,6 +90,10 @@ class User extends Model<IUser> {
   @HasMany(() => Post)
   posts!: Relation<Post[]>;
 
+  // use a custom resource named "libraries"
+  @HasMany(() => Media, 'libraries')
+  medias!: Relation<Media[]>;
+
   @BelongsToMany(() => Role)
   roles!: Relation<Role[]>;
 }

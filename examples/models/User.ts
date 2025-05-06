@@ -18,6 +18,9 @@ export class User extends Model<IUser> {
     @HasMany(() => Media)
     medias!: Relation<Media[]>;
 
+    @HasMany(() => Media, 'medias')
+    libraries!: Relation<Media[]>;
+
     @HasOne(() => Media)
     picture!: Relation<Media>;
 
