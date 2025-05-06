@@ -107,5 +107,22 @@ describe('FluORM Class', () => {
         const response = await FluORM.call('users', { method: 'OPTIONS' })
         expect(response).toBeDefined()
     })
+
+    it('can use a custom request handler', async () => {
+        FluORM.configure({
+            baseUrl: 'https://jsonplaceholder.typicode.com',
+            requestHandler: async (request) => {
+                // Handle request and return a the response
+                const response = await fetch(request.url, request.options)
+                const json = await response.json()
+                return {id: 1, name: 'John Doe'}
+            }
+        });
+
+        const response = await FluORM.call('users')
+        expect(response).toBeDefined()
+        expect(response.id).toBe(1)
+        expect(response.name).toBe('John Doe')
+    })
     
 })

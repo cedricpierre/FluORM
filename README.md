@@ -47,8 +47,10 @@ But you can provide your own request handler like `axios`.
 ```typescript
 FluORM.configure({
   baseUrl: 'https://api.example.com',
-  requestHandler: (request) => {
-    // Handle request
+  requestHandler: async (request) => {
+    // Handle request and return a the response
+    const response = await fetch(request.url, request.options)
+    return await response.json()
   }
 });
 
