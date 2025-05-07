@@ -208,7 +208,7 @@ await user.save();
 
 // Update user
 user.name = 'Jane Doe';
-await user.update();
+await user.update({ email: "test@example.com" });
 
 // Delete user
 await user.delete();
