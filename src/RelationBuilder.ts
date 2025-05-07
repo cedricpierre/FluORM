@@ -46,32 +46,32 @@ export class RelationBuilder<T extends Model<any>> {
         return model
     }
 
-    where(where: Record<string, any>): RelationBuilder<T> { 
+    where(where: Record<string, any>): RelationBuilder<typeof this.relatedModel> { 
         this.queryBuilder.where(where)
         return this
     }
 
-    filter(filters: Record<string, any>): RelationBuilder<T> { 
+    filter(filters: Record<string, any>): RelationBuilder<typeof this.relatedModel> { 
         this.queryBuilder.filter(filters)
         return this
     }
 
-    include(relations: string | string[]): RelationBuilder<T> { 
+    include(relations: string | string[]): RelationBuilder<typeof this.relatedModel> { 
         this.queryBuilder.include(relations)
         return this
     }
 
-    orderBy(field: string, dir: string = 'asc'): RelationBuilder<T> { 
+    orderBy(field: string, dir: string = 'asc'): RelationBuilder<typeof this.relatedModel> { 
         this.queryBuilder.orderBy(field, dir)
         return this
     }
 
-    limit(n: number): RelationBuilder<T> { 
+    limit(n: number): RelationBuilder<typeof this.relatedModel> { 
         this.queryBuilder.limit(n)
         return this
     }
 
-    offset(n: number): RelationBuilder<T> { 
+    offset(n: number): RelationBuilder<typeof this.relatedModel> { 
         this.queryBuilder.offset(n)
         return this
     }
