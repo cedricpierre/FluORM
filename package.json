@@ -5,6 +5,18 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "type": "module",
+  "keywords": [
+    "orm",
+    "typescript",
+    "rest",
+    "api",
+    "client",
+    "fluent",
+    "model",
+    "typescript-orm",
+    "rest-client",
+    "api-client"
+  ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
