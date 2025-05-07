@@ -16,7 +16,21 @@ npm test
 
 ## Configuration
 
-Before using FluORM, you need to configure it with your API base URL and optional interceptors:
+Before using FluORM, you need to configure it.
+
+In your `tsconfig.json`, you'll need to enable `experimentalDecorators` and `emitDecoratorMetadata`.
+
+```typescript
+{
+  "compilerOptions": {
+    ...
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+  },
+} 
+```
+
+ After you need to define an API base URL and optional interceptors:
 
 ```typescript
 import { FluORM } from 'fluorm';
