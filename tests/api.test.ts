@@ -97,6 +97,22 @@ describe('API', () => {
         expect(comments.length).toBeGreaterThan(0)
     })
 
+
+    it('cannot cache the response', async () => {
+        HttpClient.configure({
+            cacheOptions: {
+                enabled: false,
+            }
+        })
+
+        const user = await User.find(1)
+        expect(user).toBeDefined()
+        expect(user).toBeInstanceOf(User)
+
+        const cache = HttpClient.getCache("users/1")
+        expect(cache).toBeUndefined()
+    })
+
     it('can cache the response', async () => {
         HttpClient.configure({
             cacheOptions: {
@@ -105,24 +121,25 @@ describe('API', () => {
             }
         })
 
-    const response1 = await User.find(1)
-    expect(response1).toBeDefined()
-    expect(response1).toBeInstanceOf(User)
+        const response1 = await User.find(1)
+        expect(response1).toBeDefined()
+        expect(response1).toBeInstanceOf(User)
 
-    const cache = HttpClient.getCache("users/1")
-    
-    expect(cache).toBeDefined()
+        const cache = HttpClient.getCache("users/1")
+        
+        expect(cache).toBeDefined()
 
-    const user = new User(cache.data)
-    expect(user).toBeDefined()
-    expect(user).toBeInstanceOf(User)
+        const user = new User(cache.data)
 
-    // Clear cache
-    HttpClient.clearCache()
+        user.update({ name: 'Cedric updated' })
+        
+        expect(user).toBeDefined()
+        expect(user).toBeInstanceOf(User)
 
-    // Third call should not use cache
-    const response3 = await User.find(1)
-    expect(response3).toBeDefined()
-    expect(response3).toBeInstanceOf(User)
+        // Clear cache
+        HttpClient.deleteCache("users/1")
+
+        const cache2 = HttpClient.getCache("users/1")
+        expect(cache2).toBeUndefined()
     })
 })

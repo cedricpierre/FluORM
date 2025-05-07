@@ -3,12 +3,12 @@ import { HttpClient, Methods } from "./HttpClient"
 import { RelationBuilder } from "./RelationBuilder"
 
 export class HasManyRelationBuilder<T extends Model<any>> extends RelationBuilder<T> {
-    async all() {
+    async all(): Promise<Model<T>[]> {
         const list = await HttpClient.call(this.buildUrl())
         return list?.map((i: any) => new (this.relatedModel as any)(i))
     }
 
-    async create(payload: any) {
+    async create(payload: any): Promise<Model<T>> {
         const data = await HttpClient.call(this.path, {
             method: Methods.POST,
             body: payload
@@ -16,8 +16,8 @@ export class HasManyRelationBuilder<T extends Model<any>> extends RelationBuilde
         return new (this.relatedModel as any)(data)
     }
 
-    async delete(id: string | number) {
-        return await HttpClient.call(`${this.path}/${id}`, { method: Methods.DELETE })
+    async delete(id: string | number): Promise<void> {
+        await HttpClient.call(`${this.path}/${id}`, { method: Methods.DELETE })
     }
 
     async update(id: string | number, data: Record<string, any>): Promise<Model<T>> {
@@ -28,7 +28,7 @@ export class HasManyRelationBuilder<T extends Model<any>> extends RelationBuilde
         return new (this.relatedModel as any)(response)
     }
 
-    async paginate(page = 1, perPage = 10) {
+    async paginate(page = 1, perPage = 10): Promise<Model<T>[]> {
         this.queryBuilder.page(page)
             .perPage(perPage)
             .offset((page - 1) * perPage)

@@ -1,19 +1,24 @@
-import { Model, Attributes, HasMany, Cast, HasOne } from '../../src/index'
+import { Model, HasMany, Cast, HasOne } from '../../src/index'
 import { Relation } from '../../src/RelationBuilder'
 import { Company } from './Company'
 
 import { Media } from './Media'
 import { Thumbnail } from './Thumbnail'
 
-interface IUser extends Attributes {
+interface UserAttributes {
     name: string
     email: string
     created_at?: string
     updated_at?: string
 }
 
-export class User extends Model<IUser> {
+export class User extends Model<UserAttributes> implements UserAttributes {
     static resource = 'users'
+
+    name!: string
+    email!: string
+    created_at?: string
+    updated_at?: string
 
     @HasMany(() => Media)
     medias!: Relation<Media[]>;

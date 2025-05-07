@@ -3,11 +3,12 @@ import { HttpClient, Methods } from './HttpClient'
 import { HasOneRelationBuilder } from './HasOneRelationBuilder'
 import { HasManyRelationBuilder } from './HasManyRelationBuilder'
 import { Constructor } from './decorators'
+
 export interface Attributes extends Record<string, any> {
   id?: string | number
 }
 
-export class Model<A extends Attributes> {
+export class Model<T extends Partial<Attributes>> {
   static scopes?: Record<string, (query: RelationBuilder<any>) => RelationBuilder<any>>
   #path: string
 
@@ -17,7 +18,7 @@ export class Model<A extends Attributes> {
   static resource: string
   private static _queryCache = new WeakMap<Constructor<Model<any>>, any>()
 
-  constructor(data?: Partial<A>) {
+  constructor(data?: T) {
     if (data) {
       Object.assign(this, data)
     }
@@ -39,7 +40,7 @@ export class Model<A extends Attributes> {
     this.#path = path
   }
 
-  private static getRelationBuilder<T extends Model<any>>(
+  private static getRelationBuilder(
     modelClass: Constructor<T>,
     relationBuilderFactory: Constructor<RelationBuilder<any>>
   ): Relation<T> {
@@ -49,41 +50,41 @@ export class Model<A extends Attributes> {
     return Model._queryCache.get(modelClass)
   }
 
-  static id<T extends Model<any>>(id: string | number): Model<T> {
+  static id(id: string | number): Model<Attributes> {
     return new this({ id })
   }
 
-  static query<T extends Model<any>>(this: new (...args: any[]) => T): Relation<T> {
+  static query(this: new (...args: any[]) => typeof this): Relation<Attributes> {
     return Model.getRelationBuilder(this, RelationBuilder)
   }
 
-  static where<T extends Model<any>>(where: Partial<T>): Relation<T> {
+  static where(where: Partial<Attributes>): Relation<Attributes> {
     return Model.getRelationBuilder(this, RelationBuilder).where(where)
   }
 
-  static filter<T extends Model<any>>(filters: Record<string, any>): Relation<T> {
+  static filter(filters: Record<string, any>): Relation<Attributes> {
     return Model.getRelationBuilder(this, RelationBuilder).filter(filters)
   }
 
-  static include<T extends Model<any>>(relations: string | string[]): Relation<T> {
+  static include(relations: string | string[]): Relation<Attributes> {
     return Model.getRelationBuilder(this, RelationBuilder).include(relations)
   }
 
-  static async all<T extends Model<any>>(this: new (...args: any[]) => T): Promise<T[]> {
+  static async all(this: new (...args: any[]) => Attributes): Promise<Model<Attributes>[]> {
     return Model.getRelationBuilder(this, HasManyRelationBuilder).all()
   }
 
-  static async find<T extends Model<any>>(id: string | number): Promise<T> {
+  static async find(id: string | number): Promise<Model<Attributes>> {
     if (!id) throw new Error('ID is required for find operation')
     return Model.getRelationBuilder(this, HasOneRelationBuilder).find(id)
   }
 
-  static async create<T extends Model<any>>(data: Partial<T>): Promise<T> {
+  static async create(data: Partial<Attributes>): Promise<Model<Attributes>> {
     if (!data) throw new Error('Data is required for create operation')
     return Model.getRelationBuilder(this, HasManyRelationBuilder).create(data)
   }
 
-  static async update<T extends Model<any>>(id: string | number, data: Partial<T>): Promise<T> {
+  static async update(id: string | number, data: Partial<Attributes>): Promise<Model<Attributes>> {
     if (!id) throw new Error('ID is required for update operation')
     if (!data) throw new Error('Data is required for update operation')
     return Model.getRelationBuilder(this, HasManyRelationBuilder).update(id, data)
@@ -94,7 +95,7 @@ export class Model<A extends Attributes> {
     return Model.getRelationBuilder(this, HasManyRelationBuilder).delete(id)
   }
 
-  async get<T extends Model<any>>(): Promise<Model<T>> {
+  async get(): Promise<Model<T>> {
     if (!this.id) throw new Error('ID is required for get operation')
 
     const resource = (this.constructor as any).resource
@@ -131,7 +132,7 @@ export class Model<A extends Attributes> {
     }
   }
 
-  async update(data?: Partial<this>): Promise<this> {
+  async update(data?: Partial<T>): Promise<this> {
     try {
       if (!this.id) throw new Error('Cannot update a model without an ID')
       const resource = (this.constructor as any).resource

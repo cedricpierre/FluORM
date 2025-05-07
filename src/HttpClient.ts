@@ -24,6 +24,10 @@ export class HttpClient {
     this.options = { ...this.options, ...opts }
   }
 
+  static deleteCache(url: string) {
+    this.cache.delete(url);
+  }
+
   static clearCache() {
     this.cache.clear();
   }
