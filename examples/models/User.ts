@@ -1,11 +1,11 @@
-import { Model, HasMany, Cast, HasOne } from '../../src/index'
+import { Model, HasMany, Cast, HasOne, Attributes } from '../../src/index'
 import { Relation } from '../../src/RelationBuilder'
 import { Company } from './Company'
 
 import { Media } from './Media'
 import { Thumbnail } from './Thumbnail'
 
-interface UserAttributes {
+interface UserAttributes extends Attributes {
     name: string
     email: string
     created_at?: string

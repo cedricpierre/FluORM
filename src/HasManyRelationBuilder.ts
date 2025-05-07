@@ -1,5 +1,5 @@
 import { HttpClient, Methods } from "./HttpClient"
-import { Model } from "./Model"
+import { Attributes, Model } from "./Model"
 import { RelationBuilder } from "./RelationBuilder"
 
 export class HasManyRelationBuilder extends RelationBuilder<Model<any>> {
@@ -8,19 +8,19 @@ export class HasManyRelationBuilder extends RelationBuilder<Model<any>> {
         return list?.map((i: any) => new (this.relatedModel as any)(i))
     }
 
-    async create(payload: any): Promise<typeof this.relatedModel> {
-        const data = await HttpClient.call(this.path, {
+    async create(data: Partial<Attributes>): Promise<typeof this.relatedModel> {
+        const response = await HttpClient.call(this.path, {
             method: Methods.POST,
-            body: payload
+            body: data
         })
-        return new (this.relatedModel as any)(data)
+        return new (this.relatedModel as any)(response)
     }
 
     async delete(id: string | number): Promise<void> {
         await HttpClient.call(`${this.path}/${id}`, { method: Methods.DELETE })
     }
 
-    async update(id: string | number, data: Record<string, any>): Promise<typeof this.relatedModel> {
+    async update(id: string | number, data: Partial<Attributes>) {
         const response = await HttpClient.call(`${this.path}/${id}`, {
             method: Methods.PUT,
             body: data
