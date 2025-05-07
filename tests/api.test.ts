@@ -63,7 +63,7 @@ describe('API', () => {
     it('can transform the response', async () => {
         HttpClient.configure({
             responseInterceptor: (response: Response) => {
-                response.name = 'Cedric'
+                (response as any).name = 'Cedric'
                 return response
             }
         })

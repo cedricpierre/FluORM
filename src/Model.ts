@@ -41,9 +41,9 @@ export class Model<T extends Partial<Attributes>> {
   }
 
   private static getRelationBuilder(
-    modelClass: Constructor<T>,
+    modelClass: Constructor<Model<any>>,
     relationBuilderFactory: Constructor<RelationBuilder<any>>
-  ): Relation<T> {
+  ): Relation<Model<any>> {
     if (!Model._queryCache.has(modelClass)) {
       Model._queryCache.set(modelClass, new relationBuilderFactory(() => modelClass as any))
     }
@@ -54,7 +54,7 @@ export class Model<T extends Partial<Attributes>> {
     return new this({ id })
   }
 
-  static query(this: new (...args: any[]) => typeof this): Relation<Attributes> {
+  static query(this: Constructor<Model<Attributes>>): Relation<Attributes> {
     return Model.getRelationBuilder(this, RelationBuilder)
   }
 
@@ -70,7 +70,7 @@ export class Model<T extends Partial<Attributes>> {
     return Model.getRelationBuilder(this, RelationBuilder).include(relations)
   }
 
-  static async all(this: new (...args: any[]) => Attributes): Promise<Model<Attributes>[]> {
+  static async all(this: Constructor<Model<Attributes>>): Promise<Model<Attributes>[]> {
     return Model.getRelationBuilder(this, HasManyRelationBuilder).all()
   }
 
