@@ -2,13 +2,13 @@ import { HttpClient, Methods } from "./HttpClient"
 import { Attributes, Model } from "./Model"
 import { RelationBuilder } from "./RelationBuilder"
 
-export class HasManyRelationBuilder extends RelationBuilder<Model<any>> {
-    async all(): Promise<typeof this.relatedModel[]> {
+export class HasManyRelationBuilder<T extends Model<any>> extends RelationBuilder<T> {
+    async all(): Promise<T[]> {
         const list = await HttpClient.call(this.buildUrl())
         return list?.map((i: any) => new (this.relatedModel as any)(i))
     }
 
-    async create(data: Partial<Attributes>): Promise<typeof this.relatedModel> {
+    async create(data: Partial<Attributes>): Promise<T> {
         const response = await HttpClient.call(this.path, {
             method: Methods.POST,
             body: data
@@ -20,7 +20,7 @@ export class HasManyRelationBuilder extends RelationBuilder<Model<any>> {
         await HttpClient.call(`${this.path}/${id}`, { method: Methods.DELETE })
     }
 
-    async update(id: string | number, data: Partial<Attributes>) {
+    async update(id: string | number, data: Partial<Attributes>): Promise<T> {
         const response = await HttpClient.call(`${this.path}/${id}`, {
             method: Methods.PUT,
             body: data
@@ -28,7 +28,7 @@ export class HasManyRelationBuilder extends RelationBuilder<Model<any>> {
         return new (this.relatedModel as any)(response)
     }
 
-    async paginate(page = 1, perPage = 10): Promise<typeof this.relatedModel[]> {
+    async paginate(page = 1, perPage = 10): Promise<T[]> {
         this.queryBuilder.page(page)
             .perPage(perPage)
             .offset((page - 1) * perPage)

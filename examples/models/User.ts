@@ -1,5 +1,5 @@
 import { Model, HasMany, Cast, HasOne, Attributes } from '../../src/index'
-import { Relation } from '../../src/RelationBuilder'
+import { Relation, RelationBuilder } from '../../src/RelationBuilder'
 import { Company } from './Company'
 
 import { Media } from './Media'
@@ -39,6 +39,6 @@ export class User extends Model<UserAttributes> implements UserAttributes {
     company!: Company
 
     static scopes = {
-        active: (query: Relation<User>) => query.where({ status: 'active' }),
+        active: (query: RelationBuilder<User>) => query.where({ status: 'active' }),
     }
 }

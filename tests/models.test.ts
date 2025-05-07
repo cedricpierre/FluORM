@@ -302,6 +302,7 @@ describe('Models', () => {
   
     const media = await user.medias.include('thumbnails').find(2)
 
+
     expect(media).toBeInstanceOf(Media)
     expect(media.id).toBe('2')
     expect(media.name).toBe('thumbnail')

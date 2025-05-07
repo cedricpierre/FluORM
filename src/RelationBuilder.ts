@@ -1,9 +1,14 @@
 import { Model } from "./Model"
 import { HttpClient } from "./HttpClient"
 import { URLQueryBuilder } from "./URLQueryBuilder"
+import { HasManyRelationBuilder } from "./HasManyRelationBuilder"
+import { HasOneRelationBuilder } from "./HasOneRelationBuilder"
 
-export type Relation<T> = any
-export type RelationFor<T> = T extends Array<any> ? Relation<T> : Relation<T[]>
+export type Relation<T> = T extends Model<any>
+    ? HasOneRelationBuilder<T>
+    : T extends Array<Model<any>>
+        ? HasManyRelationBuilder<T[number]>
+        : never
 
 export class RelationBuilder<T extends Model<any>> {
     protected queryBuilder: URLQueryBuilder
@@ -22,56 +27,57 @@ export class RelationBuilder<T extends Model<any>> {
         if (this.relatedModel.scopes) {
             Object.entries(this.relatedModel.scopes).forEach(([name, scope]) => {
                 (this as any)[name] = (...args: any[]) => {
-                    return (scope as any)(this, ...args)
+                    return (scope as any)(this, ...args) as RelationBuilder<T>
                 }
             })
         }
     }
 
-    id(id: string | number): Model<T> { 
+    // Add type definition for dynamic scope methods
+    [key: string]: any
+
+    id(id: string | number): T { 
         const model = new (this.relatedModel as any)({ id })
         model.path = `${this.path}/${id}`
         return model
     }
 
-    async find(id: string | number): Promise<Model<T>> {
-        
+    async find(id: string | number): Promise<T> {
         this.queryBuilder.id(id)
 
         const response = await HttpClient.call(this.buildUrl())
         const model = new (this.relatedModel as any)(response)
-
         model.path = `${this.path}/${id}`
 
         return model
     }
 
-    where(where: Record<string, any>): RelationBuilder<typeof this.relatedModel> { 
+    where(where: Record<string, any>): RelationBuilder<T> { 
         this.queryBuilder.where(where)
         return this
     }
 
-    filter(filters: Record<string, any>): RelationBuilder<typeof this.relatedModel> { 
+    filter(filters: Record<string, any>): RelationBuilder<T> { 
         this.queryBuilder.filter(filters)
         return this
     }
 
-    include(relations: string | string[]): RelationBuilder<typeof this.relatedModel> { 
+    include(relations: string | string[]): RelationBuilder<T> { 
         this.queryBuilder.include(relations)
         return this
     }
 
-    orderBy(field: string, dir: string = 'asc'): RelationBuilder<typeof this.relatedModel> { 
+    orderBy(field: string, dir: string = 'asc'): RelationBuilder<T> { 
         this.queryBuilder.orderBy(field, dir)
         return this
     }
 
-    limit(n: number): RelationBuilder<typeof this.relatedModel> { 
+    limit(n: number): RelationBuilder<T> { 
         this.queryBuilder.limit(n)
         return this
     }
 
-    offset(n: number): RelationBuilder<typeof this.relatedModel> { 
+    offset(n: number): RelationBuilder<T> { 
         this.queryBuilder.offset(n)
         return this
     }
