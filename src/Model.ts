@@ -95,7 +95,7 @@ export class Model<T extends Partial<Attributes>> {
     return Model.getRelationBuilder(this, HasManyRelationBuilder).delete(id)
   }
 
-  async get(): Promise<Model<T>> {
+  async get(): Promise<this> {
     if (!this.id) throw new Error('ID is required for get operation')
 
     const resource = (this.constructor as any).resource

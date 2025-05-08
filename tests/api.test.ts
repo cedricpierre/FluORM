@@ -26,6 +26,15 @@ describe('API', () => {
         expect(user.company).toBeInstanceOf(Company)
     })
 
+
+    it('should get a user by id', async () => {
+        const user = await User.id(1).get()
+        expect(user).toBeDefined()
+
+        expect(user.company).toBeDefined()
+        expect(user.company).toBeInstanceOf(Company)
+    })
+
     it('should create a user', async () => {
         const user = await User.create({ name: 'Cedric', email: 'cedric@example.com' })
 
