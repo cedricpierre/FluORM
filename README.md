@@ -16,19 +16,33 @@ npm test
 
 ## Configuration
 
-Before using FluORM, you need to configure it.
+In JavaScript, property decorators are not natively supported yet (as of 2025), but they can be enabled using transpilers like Babel or TypeScript with experimental support.
 
-In your `tsconfig.json`, you'll need to enable `experimentalDecorators` and `emitDecoratorMetadata`.
+Here’s how to enable and use them in TypeScript, which has the best support for decorators:
+
+### Typescript
+
+In your `tsconfig.json`
 
 ```typescript
 {
   "compilerOptions": {
-    ...
+    "target": "ESNext",
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "useDefineForClassFields": false,
-  },
-} 
+    "useDefineForClassFields": false
+  }
+}
+```
+
+### If you are using Babel
+
+```json
+{
+  "plugins": [
+    ["@babel/plugin-proposal-decorators", { "version": "legacy" }],
+    ["@babel/plugin-proposal-class-properties", { "loose": true }]
+  ]
+}
 ```
 
  After you need to define an API base URL and optional interceptors:
