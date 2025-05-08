@@ -6,5 +6,8 @@
 		{
 			"path": "../FluORM-test"
 		}
-	]
+	],
+	"settings": {
+		"typescript.tsdk": "FluORM/node_modules/typescript/lib"
+	}
 }
