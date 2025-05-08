@@ -19,14 +19,14 @@
   ],
   "exports": {
     ".": {
-      "types": "./dist/src/index.d.ts",
-      "import": "./dist/src/index.js"
+      "types": "./dist/fluorm.d.ts",
+      "import": "./dist/fluorm.js"
     }
   },
   "author": "Cedric Pierre",
   "email": "jirotoh@gmail.com",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && esbuild src/index.ts --bundle --format=esm --outfile=dist/fluorm.js --minify && dts-bundle-generator --config dts-bundle-generator.config.json",
     "test": "vitest"
   },
   "repository": {
@@ -43,6 +43,8 @@
     "README.md"
   ],
   "devDependencies": {
+    "dts-bundle-generator": "^9.5.1",
+    "esbuild": "^0.25.4",
     "typescript": "^5.8.2",
     "vitest": "^3.1.2"
   }

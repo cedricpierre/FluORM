@@ -9,7 +9,7 @@ export class HttpClient {
           'Content-Type': 'application/json',
         }
       }
-    } as unknown as Request,
+    } as unknown as HttpRequest,
     requestInterceptor: undefined,
     responseInterceptor: undefined,
     errorInterceptor: undefined,
@@ -39,7 +39,7 @@ export class HttpClient {
   static async call<T = any>(
     url: string,
     options?: RequestOptions
-  ): Promise<Response<T>> {
+  ): Promise<HttpResponse<T>> {
     if (!this.options.baseUrl) {
       throw new Error('baseUrl is required')
     }
@@ -50,7 +50,7 @@ export class HttpClient {
       if (cachedData) {
         const now = Date.now();
         if (now - cachedData.timestamp < (this.options.cacheOptions.ttl || 0)) {
-          return cachedData.data as Response<T>;
+          return cachedData.data as HttpResponse<T>;
         }
         // Remove expired cache entry
         this.cache.delete(url);
@@ -58,13 +58,13 @@ export class HttpClient {
     }
 
     const finalOptions = { ...options, ...this.options?.request?.options } as RequestOptions
-    const request = { url:`${this.options.baseUrl}/${url}`, options: finalOptions } as Request
+    const request = { url:`${this.options.baseUrl}/${url}`, options: finalOptions } as HttpRequest
 
     if (this.options.requestInterceptor) {
       Object.assign(request, this.options.requestInterceptor.call(this, request))
     }
 
-    let response = {} as unknown as Response<T>
+    let response = {} as unknown as HttpResponse<T>
 
     if (this.options.requestHandler) {
       response = await this.options.requestHandler.call(this, request)
@@ -75,7 +75,7 @@ export class HttpClient {
 
       const resp = await fetch(request.url, request.options as RequestInit);
       if (resp.ok) {
-        response = await resp.json() as Response<T>;
+        response = await resp.json() as HttpResponse<T>;
       }
     }
 
@@ -110,11 +110,11 @@ export type MethodType = keyof typeof Methods;
 
 interface HttpClientOptions {
   baseUrl?: string
-  request?: Request,
-  requestInterceptor?: (request: Request) => Request
-  responseInterceptor?: (response: Response) => Response
+  request?: HttpRequest,
+  requestInterceptor?: (request: HttpRequest) => HttpRequest
+  responseInterceptor?: (response: HttpResponse) => HttpResponse
   errorInterceptor?: (error: Error) => void
-  requestHandler?: (request: Request) => Promise<Response>
+  requestHandler?: (request: HttpRequest) => Promise<HttpResponse>
   cacheOptions?: CacheOptions
 }
 
@@ -123,12 +123,12 @@ interface CacheOptions {
   ttl?: number; // Time to live in milliseconds
 }
 
-export interface Request {
+export interface HttpRequest {
   url: string
   options: RequestOptions
 }
 
-export type Response<T = any> = T | T[]
+export type HttpResponse<T = any> = T | T[]
 
 export interface RequestOptions {
   body?: any,
