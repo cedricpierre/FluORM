@@ -26,6 +26,7 @@ In your `tsconfig.json`, you'll need to enable `experimentalDecorators` and `emi
     ...
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
+    "useDefineForClassFields": false,
   },
 } 
 ```

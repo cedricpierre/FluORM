@@ -12,10 +12,10 @@
     "declaration": false,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "useDefineForClassFields": true,
-    "allowJs": true,
+    "useDefineForClassFields": false,
+    "allowJs": false,
     "resolveJsonModule": true
   },
-  "include": ["./src/**/*.ts", "./examples/**/*.ts"],
+  "include": ["./src/**/*.ts"],
   "exclude": ["node_modules", "dist"]
 } 
