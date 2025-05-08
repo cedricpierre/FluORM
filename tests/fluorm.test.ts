@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { FluORM, Request, Response } from '../src/index'
+import { FluORM, HttpRequest, HttpResponse } from '../src/index'
 
 describe('FluORM Class', () => {
     beforeEach(() => {
@@ -16,7 +16,7 @@ describe('FluORM Class', () => {
     it('can configure the request interceptor', () => {
         vi.spyOn(FluORM, 'call').mockResolvedValue(true)
         
-        const interceptor = (request: Request) => {
+        const interceptor = (request: HttpRequest) => {
             return request
         }
 
@@ -27,7 +27,7 @@ describe('FluORM Class', () => {
     it('can configure the response interceptor', () => {
         vi.spyOn(FluORM, 'call').mockResolvedValue(true)
 
-        const interceptor = (response: Response) => {
+        const interceptor = (response: HttpResponse) => {
             return response
         }
 
@@ -37,11 +37,11 @@ describe('FluORM Class', () => {
 
     it('can configure the request handler', async () => {
     
-        const handler = (request: Request) => {
+        const handler = (request: HttpRequest) => {
             expect(request.url).toBe('https://api.example.com/users')
             expect(request.options).toBeDefined()
             expect(request.options?.method).toBe('GET')
-            return Promise.resolve<Response>(true)
+            return Promise.resolve<HttpResponse>(true)
         }
         
         FluORM.configure({ requestHandler: handler })
