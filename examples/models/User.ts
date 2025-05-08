@@ -1,5 +1,5 @@
-import { Model, HasMany, Cast, HasOne, Attributes } from '../../src/index'
-import { Relation, RelationBuilder } from '../../src/RelationBuilder'
+import { Model, HasMany, Relation, Attributes, Cast, HasOne, RelationBuilder } from '../../src/index'
+
 import { Company } from './Company'
 
 import { Media } from './Media'
