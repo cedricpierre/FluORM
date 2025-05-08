@@ -7,6 +7,7 @@ import { Thumbnail } from './Thumbnail'
 
 interface UserAttributes extends Attributes {
     name: string
+    phone: number
     email: string
     created_at?: string
     updated_at?: string
@@ -17,6 +18,7 @@ export class User extends Model<UserAttributes> implements UserAttributes {
 
     name!: string
     email!: string
+    phone!: number
     created_at?: string
     updated_at?: string
 

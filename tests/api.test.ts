@@ -3,7 +3,7 @@ import { expect, describe, it, vi } from 'vitest'
 import { User } from '../examples/models/User'
 import { Post } from '../examples/models/Post'
 import { Comment } from '../examples/models/Comment'
-import { FluORM, HttpClient } from '../src'
+import { FluORM, HttpClient, Model } from '../src'
 import { Company } from '../examples/models/Company'
 
 FluORM.configure({
@@ -16,6 +16,12 @@ describe('API', () => {
 
         const users = await User.all()
         expect(users).toBeDefined()
+    })
+
+    it('can create a new User', async () => {
+        const user = await new User({ name: 'Cedric', email: 'cedric@example.com', phone: 1234567890 })
+        expect(user).toBeDefined()
+        expect(user).toBeInstanceOf(User)
     })
 
     it('should fetch a user by id', async () => {

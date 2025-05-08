@@ -54,43 +54,43 @@ export class Model<T extends Partial<Attributes>> {
     return new this({ id })
   }
 
-  static query<T extends Model<any>>(this: Constructor<T>): RelationBuilder<T> {
+  static query<T extends Model<Attributes>>(this: Constructor<T>): RelationBuilder<T> {
     return Model.getRelationBuilder<T, RelationBuilder<T>>(this, RelationBuilder)
   }
 
-  static where<T extends Model<any>>(this: Constructor<T>, where: Partial<Attributes>): RelationBuilder<T> {
+  static where<T extends Model<Attributes>>(this: Constructor<T>, where: Partial<Attributes>): RelationBuilder<T> {
     return Model.getRelationBuilder<T, RelationBuilder<T>>(this, RelationBuilder).where(where)
   }
 
-  static filter<T extends Model<any>>(this: Constructor<T>, filters: Record<string, any>): RelationBuilder<T> {
+  static filter<T extends Model<Attributes>>(this: Constructor<T>, filters: Record<string, any>): RelationBuilder<T> {
     return Model.getRelationBuilder<T, RelationBuilder<T>>(this, RelationBuilder).filter(filters)
   }
 
-  static include<T extends Model<any>>(this: Constructor<T>, relations: string | string[]): RelationBuilder<T> {
+  static include<T extends Model<Attributes>>(this: Constructor<T>, relations: string | string[]): RelationBuilder<T> {
     return Model.getRelationBuilder<T, RelationBuilder<T>>(this, RelationBuilder).include(relations)
   }
 
-  static async all<T extends Model<any>>(this: Constructor<T>): Promise<T[]> {
+  static async all<T extends Model<Attributes>>(this: Constructor<T>): Promise<T[]> {
     return (await Model.getRelationBuilder<T, HasManyRelationBuilder<T>>(this, HasManyRelationBuilder).all()) as T[]
   }
 
-  static async find<T extends Model<any>>(this: Constructor<T>, id: string | number): Promise<T> {
+  static async find<T extends Model<Attributes>>(this: Constructor<T>, id: string | number): Promise<T> {
     if (!id) throw new Error('ID is required for find operation')
     return (await Model.getRelationBuilder<T, HasOneRelationBuilder<T>>(this, HasOneRelationBuilder).find(id)) as T
   }
 
-  static async create<T extends Model<any>>(this: Constructor<T>, data: Partial<Attributes>): Promise<T> {
+  static async create<T extends Model<Attributes>>(this: Constructor<T>, data: Partial<Attributes>): Promise<T> {
     if (!data) throw new Error('Data is required for create operation')
     return (await Model.getRelationBuilder<T, HasManyRelationBuilder<T>>(this, HasManyRelationBuilder).create(data)) as T
   }
 
-  static async update<T extends Model<any>>(this: Constructor<T>, id: string | number, data: Partial<Attributes>): Promise<T> {
+  static async update<T extends Model<Attributes>>(this: Constructor<T>, id: string | number, data: Partial<Attributes>): Promise<T> {
     if (!id) throw new Error('ID is required for update operation')
     if (!data) throw new Error('Data is required for update operation')
     return (await Model.getRelationBuilder<T, HasManyRelationBuilder<T>>(this, HasManyRelationBuilder).update(id, data)) as T
   }
 
-  static async delete<T extends Model<any>>(this: Constructor<T>, id: string | number): Promise<void> {
+  static async delete<T extends Model<Attributes>>(this: Constructor<T>, id: string | number): Promise<void> {
     if (!id) throw new Error('ID is required for delete operation')
     return Model.getRelationBuilder(this, HasManyRelationBuilder).delete(id)
   }
