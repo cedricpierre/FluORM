@@ -12,7 +12,7 @@
     "declaration": false,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "useDefineForClassFields": true,
+    "useDefineForClassFields": false,
     "allowJs": false,
     "resolveJsonModule": true
   },

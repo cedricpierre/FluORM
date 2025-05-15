@@ -13,7 +13,7 @@ export class HttpClient {
     requestInterceptor: undefined,
     responseInterceptor: undefined,
     errorInterceptor: undefined,
-    requestHandler: undefined,
+    requestHandler: fetchRequestHandler,
     cacheOptions: {
       enabled: false,
       ttl: 5 * 60 * 1000, // 5 minutes in milliseconds
@@ -64,20 +64,7 @@ export class HttpClient {
       Object.assign(request, this.options.requestInterceptor.call(this, request))
     }
 
-    let response = {} as unknown as HttpResponse<T>
-
-    if (this.options.requestHandler) {
-      response = await this.options.requestHandler.call(this, request)
-    } else {
-      if (request.options.headers && request.options.headers['Content-Type'] === 'application/json') {
-        request.options.body = JSON.stringify(request.options.body)
-      }
-
-      const resp = await fetch(request.url, request.options as RequestInit);
-      if (resp.ok) {
-        response = await resp.json() as HttpResponse<T>;
-      }
-    }
+    let response = await this.options.requestHandler!.call(this, request);
 
     if (this.options.responseInterceptor) {
       response = this.options.responseInterceptor.call(this, response)
@@ -94,6 +81,21 @@ export class HttpClient {
     return response
   }
 }
+
+export async function fetchRequestHandler(request: HttpRequest): Promise<HttpResponse> {
+  const options = { ...request.options };
+
+  if (options.headers?.['Content-Type'] === 'application/json' && options.body) {
+    options.body = JSON.stringify(options.body);
+  }
+
+  const res = await fetch(request.url, options as RequestInit);
+  if (!res.ok) {
+    throw new Error(`HTTP error: ${res.status}`);
+  }
+
+  return res.json();
+};
 
 export const Methods = {
   GET: 'GET',
