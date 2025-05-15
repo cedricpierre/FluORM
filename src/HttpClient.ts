@@ -1,5 +1,5 @@
 export class HttpClient {
-  private static cache: Map<string, CacheData> = new Map();
+  static #cache: Map<string, CacheData> = new Map();
 
   static options: HttpClientOptions = {
     baseUrl: '',
@@ -25,60 +25,71 @@ export class HttpClient {
   }
 
   static deleteCache(url: string) {
-    this.cache.delete(url);
+    this.#cache.delete(url);
   }
 
   static clearCache() {
-    this.cache.clear();
+    this.#cache.clear();
+  }
+
+  static get cache() {
+    return this.#cache
   }
 
   static getCache<T = any>(url: string): CacheData {
-    return this.cache.get(url) as CacheData
+    return this.#cache.get(url) as CacheData
   }
 
   static async call<T = any>(
     url: string,
     options?: RequestOptions
   ): Promise<HttpResponse<T>> {
-    if (!this.options.baseUrl) {
-      throw new Error('baseUrl is required')
-    }
-
-    // Check cache if enabled
-    if (this.options.cacheOptions?.enabled) {
-      const cachedData = this.cache.get(url);
-      if (cachedData) {
-        const now = Date.now();
-        if (now - cachedData.timestamp < (this.options.cacheOptions.ttl || 0)) {
-          return cachedData.data as HttpResponse<T>;
-        }
-        // Remove expired cache entry
-        this.cache.delete(url);
+    try {
+      if (!this.options.baseUrl) {
+        throw new Error('baseUrl is required')
       }
+
+      // Check cache if enabled
+      if (this.options.cacheOptions?.enabled) {
+        const cachedData = this.#cache.get(url);
+        if (cachedData) {
+          const now = Date.now();
+          if (now - cachedData.timestamp < (this.options.cacheOptions.ttl || 0)) {
+            return cachedData.data as HttpResponse<T>;
+          }
+          // Remove expired cache entry
+          this.#cache.delete(url);
+        }
+      }
+
+      const finalOptions = { ...options, ...this.options?.request?.options } as RequestOptions
+      const request = { url:`${this.options.baseUrl}/${url}`, options: finalOptions } as HttpRequest
+
+      if (this.options.requestInterceptor) {
+        Object.assign(request, this.options.requestInterceptor.call(this, request))
+      }
+
+      let response = await this.options.requestHandler!.call(this, request);
+
+      if (this.options.responseInterceptor) {
+        response = this.options.responseInterceptor.call(this, response)
+      }
+
+      // Store in cache if enabled
+      if (this.options.cacheOptions?.enabled) {
+        this.#cache.set(url, {
+          data: response,
+          timestamp: Date.now()
+        });
+      }
+      
+      return response
+    } catch (error) {
+      if (this.options.errorInterceptor && error instanceof Error) {
+        this.options.errorInterceptor(error)
+      }
+      throw error
     }
-
-    const finalOptions = { ...options, ...this.options?.request?.options } as RequestOptions
-    const request = { url:`${this.options.baseUrl}/${url}`, options: finalOptions } as HttpRequest
-
-    if (this.options.requestInterceptor) {
-      Object.assign(request, this.options.requestInterceptor.call(this, request))
-    }
-
-    let response = await this.options.requestHandler!.call(this, request);
-
-    if (this.options.responseInterceptor) {
-      response = this.options.responseInterceptor.call(this, response)
-    }
-
-    // Store in cache if enabled
-    if (this.options.cacheOptions?.enabled) {
-      this.cache.set(url, {
-        data: response,
-        timestamp: Date.now()
-      });
-    }
-    
-    return response
   }
 }
 
@@ -89,12 +100,13 @@ export async function fetchRequestHandler(request: HttpRequest): Promise<HttpRes
     options.body = JSON.stringify(options.body);
   }
 
-  const res = await fetch(request.url, options as RequestInit);
-  if (!res.ok) {
-    throw new Error(`HTTP error: ${res.status}`);
+  try {
+    const res = await fetch(request.url, options as RequestInit);
+    
+    return res.json();
+  } catch (error) {
+    throw new Error(`HTTP error: ${error}`);
   }
-
-  return res.json();
 };
 
 export const Methods = {

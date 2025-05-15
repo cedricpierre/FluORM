@@ -11,6 +11,7 @@ interface UserAttributes extends Attributes {
     email: string
     created_at?: string
     updated_at?: string
+    thumbnail?: Thumbnail
 }
 
 export class User extends Model<UserAttributes> implements UserAttributes {
@@ -27,6 +28,9 @@ export class User extends Model<UserAttributes> implements UserAttributes {
 
     @HasMany(() => Media, 'medias')
     libraries!: Relation<Media[]>;
+
+    @HasMany(() => Media, 'custom-resource')
+    customResource!: Relation<Media[]>;
 
     @HasOne(() => Media)
     picture!: Relation<Media>;

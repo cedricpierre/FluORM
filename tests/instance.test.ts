@@ -4,7 +4,7 @@ import { FluORM } from '../src/index'
 import { Media } from '../examples/models/Media'
 import { Thumbnail } from '../examples/models/Thumbnail'
 
-let user: User = new User({ id: '123', name: 'Cedric', email: 'cedric@example.com' })
+let user: User = new User({ id: '123', name: 'Cedric', email: 'cedric@example.com', phone: 1234567890 })
 const baseUrl = 'http://localhost:3000'
 FluORM.configure({
   baseUrl

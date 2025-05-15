@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { User } from '../examples/models/User'
-import { FluORM } from '../src/index'
+import { FluORM, Methods } from '../src/index'
 import { Media } from '../examples/models/Media'
 import { Thumbnail } from '../examples/models/Thumbnail'
 
@@ -340,13 +340,44 @@ describe('Models', () => {
     vi.spyOn(FluORM, 'call').mockImplementation((url) => {
       expect(url).toBe(`users?name=Cedric`)
       expect(url.includes('name=Cedric')).toBeTruthy()
+      expect(url.includes('include=medias')).toBeTruthy()
       return Promise.resolve([])
     })
     .mockResolvedValue([
       { id: '1', name: 'Cedric', email: 'cedric@example.com' }
     ])
 
-    const users = await User.query().where({ name: 'Cedric' }).all()
+    const users = await User.query().include('medias').where({ name: 'Cedric' }).all()
+
+    expect(users).toBeInstanceOf(Array)
+    expect(users).toHaveLength(1)
+    expect(users[0]).toBeInstanceOf(User)
+    expect(users[0].name).toBe('Cedric')
+  })
+
+  it('can use the get method', async () => {
+    vi.spyOn(FluORM, 'call').mockImplementation((url) => {
+      expect(url).toBe(`users/1`)
+      return Promise.resolve({ id: '1', name: 'Cedric', email: 'cedric@example.com' })
+    })
+
+    const user = await User.id(1).get()
+
+    expect(user).toBeInstanceOf(User)
+    expect(user.id).toBe('1')
+    expect(user.name).toBe('Cedric')
+  })
+
+  it('can use the static include method', async () => {
+    vi.spyOn(FluORM, 'call').mockImplementation((url) => {
+      expect(url).toBe(`users?include=medias`)
+      expect(url.includes('include=medias')).toBeTruthy()
+      return Promise.resolve([
+        { id: '1', name: 'Cedric', email: 'cedric@example.com' }
+      ])
+    })
+
+    const users = await User.include('medias').all()
 
     expect(users).toBeInstanceOf(Array)
     expect(users).toHaveLength(1)

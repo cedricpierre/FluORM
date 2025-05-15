@@ -13,7 +13,7 @@ export class Model<T extends Partial<Attributes>> {
   #path: string
 
   id?: string | number
-  [key: string]: any  
+  [key: string]: any
 
   static resource: string
   private static _queryCache = new WeakMap<Constructor<Model<any>>, any>()
@@ -75,32 +75,25 @@ export class Model<T extends Partial<Attributes>> {
   }
 
   static async find<T extends Model<Attributes>>(this: Constructor<T>, id: string | number): Promise<T> {
-    if (!id) throw new Error('ID is required for find operation')
     return (await Model.getRelationBuilder<T, HasOneRelationBuilder<T>>(this, HasOneRelationBuilder).find(id)) as T
   }
 
   static async create<T extends Model<Attributes>>(this: Constructor<T>, data: Partial<Attributes>): Promise<T> {
-    if (!data) throw new Error('Data is required for create operation')
     return (await Model.getRelationBuilder<T, HasManyRelationBuilder<T>>(this, HasManyRelationBuilder).create(data)) as T
   }
 
   static async update<T extends Model<Attributes>>(this: Constructor<T>, id: string | number, data: Partial<Attributes>): Promise<T> {
-    if (!id) throw new Error('ID is required for update operation')
-    if (!data) throw new Error('Data is required for update operation')
     return (await Model.getRelationBuilder<T, HasManyRelationBuilder<T>>(this, HasManyRelationBuilder).update(id, data)) as T
   }
 
   static async delete<T extends Model<Attributes>>(this: Constructor<T>, id: string | number): Promise<void> {
-    if (!id) throw new Error('ID is required for delete operation')
     return Model.getRelationBuilder(this, HasManyRelationBuilder).delete(id)
   }
 
   async get(): Promise<this> {
-    if (!this.id) throw new Error('ID is required for get operation')
-
     const resource = (this.constructor as any).resource
 
-    const data = await HttpClient.call(`${resource}/${this.id}` , {
+    const data = await HttpClient.call(`${resource}/${this.id}`, {
       method: Methods.GET,
     })
 
@@ -110,65 +103,43 @@ export class Model<T extends Partial<Attributes>> {
   }
 
   async save(): Promise<this> {
-    try {
-      if (this.id) {
-        return this.update()
-      }
-      
-      const resource = (this.constructor as any).resource
-      if (!resource) throw new Error('Resource name is not defined')
-      
-      const data = await HttpClient.call(resource, {
-        method: Methods.POST,
-        body: { ...this }
-      })
-      Object.assign(this, data)
-      return this
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        throw new Error(`Failed to save model: ${error.message}`)
-      }
-      throw new Error('Failed to save model: Unknown error')
+
+    if (this.id) {
+      return this.update()
     }
+
+    const resource = (this.constructor as any).resource
+
+    const data = await HttpClient.call(resource, {
+      method: Methods.POST,
+      body: { ...this }
+    })
+    Object.assign(this, data)
+    return this
   }
 
   async update(data?: Partial<T>): Promise<this> {
-    try {
-      if (!this.id) throw new Error('Cannot update a model without an ID')
-      const resource = (this.constructor as any).resource
-      if (!resource) throw new Error('Resource name is not defined')
-      
-      if (data) Object.assign(this, data)
-      const updated = await HttpClient.call(`${resource}/${this.id}`, {
-        method: Methods.PATCH,
-        body: { ...this }
-      })
-      Object.assign(this, updated)
-      return this
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        throw new Error(`Failed to update model: ${error.message}`)
-      }
-      throw new Error('Failed to update model: Unknown error')
-    }
+    const resource = (this.constructor as any).resource
+
+
+    if (data) Object.assign(this, data)
+    const updated = await HttpClient.call(`${resource}/${this.id}`, {
+      method: Methods.PATCH,
+      body: { ...this }
+    })
+    Object.assign(this, updated)
+    return this
   }
 
+
   async delete(): Promise<void> {
-    try {
-      if (!this.id) throw new Error('Cannot delete a model without an ID')
-      const resource = (this.constructor as any).resource
-      if (!resource) throw new Error('Resource name is not defined')
-      
-      await HttpClient.call(`${resource}/${this.id}`, {
-        method: Methods.DELETE
-      })
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        throw new Error(`Failed to delete model: ${error.message}`)
-      }
-      throw new Error('Failed to delete model: Unknown error')
-    }
+    const resource = (this.constructor as any).resource
+
+    await HttpClient.call(`${resource}/${this.id}`, {
+      method: Methods.DELETE
+    })
   }
+
 
   toObject(): Record<string, any> {
     const obj: Record<string, any> = {}

@@ -93,7 +93,7 @@ describe('API', () => {
         expect(post).toBeDefined()
         expect(post).toBeInstanceOf(Post)
 
-        let comments = await post.comments.all()
+        let comments = await post.comments.limit(10).offset(10).all()
         expect(comments).toBeDefined()
         expect(comments).toBeInstanceOf(Array)
         expect(comments.length).toBeGreaterThan(0)
