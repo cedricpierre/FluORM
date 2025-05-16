@@ -4,6 +4,12 @@
 
 FluORM ("Flu{ent}-ORM") is a lightweight and flexible Object-Relational Mapping (ORM) library for TypeScript/JavaScript applications. It provides a simple and intuitive way to interact with your API endpoints while maintaining type safety and following object-oriented principles.
 
+## Quality & Reliability
+
+- 💯 Written in TypeScript
+- 🧪 99% test coverage with Vitest
+- ⚡️ Designed for fast, type-safe API interactions
+
 ## Installation
 
 ```bash
