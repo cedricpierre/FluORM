@@ -1,5 +1,12 @@
 ![Coverage](https://codecov.io/gh/cedricpierre/FluORM/branch/main/graph/badge.svg)
 ![npm](https://img.shields.io/npm/v/fluorm)
+![CI](https://github.com/cedricpierre/FluORM/actions/workflows/ci.yml/badge.svg)
+![TypeScript](https://img.shields.io/badge/typed-TypeScript-blue.svg)
+![tree-shakable](https://img.shields.io/badge/tree--shakable-yes-brightgreen)
+
+
+
+
 # FluORM
 
 FluORM ("Flu{ent}-ORM") is a lightweight and flexible Object-Relational Mapping (ORM) library for TypeScript/JavaScript applications. It provides a simple and intuitive way to interact with your API endpoints while maintaining type safety and following object-oriented principles.
